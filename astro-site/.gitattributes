@@ -1,0 +1,29 @@
+# Normalize line endings: store LF in the repo, checkout CRLF on Windows.
+# Prevents the "LF will be replaced by CRLF" warnings and keeps diffs clean.
+* text=auto
+
+# Text files that must stay LF (scripts run on Linux CI, shell scripts, etc.)
+*.js      text eol=lf
+*.mjs     text eol=lf
+*.ts      text eol=lf
+*.json    text eol=lf
+*.astro   text eol=lf
+*.css     text eol=lf
+*.svg     text eol=lf
+*.yml     text eol=lf
+*.yaml    text eol=lf
+*.md      text eol=lf
+*.py      text eol=lf
+*.sh      text eol=lf
+
+# Binary files — never touch line endings
+*.png     binary
+*.jpg     binary
+*.jpeg    binary
+*.gif     binary
+*.ico     binary
+*.woff    binary
+*.woff2   binary
+*.ttf     binary
+*.exe     binary
+*.tar.gz  binary
