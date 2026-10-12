@@ -1,0 +1,104 @@
+---
+import { repoUrl } from '../config';
+const { lang = 'en' } = Astro.props;
+const zh = lang === 'zh';
+const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
+const base = `${baseUrl}${zh ? '/zh' : ''}`;
+const href = (p) => `${base}${p.replace(/^\/zh/, '')}`;
+const t = zh
+  ? {
+      docs: '文档',
+      project: '项目',
+      community: '社区',
+      tagline:
+        '一个用于加速全生命周期大规模多模态 MRI 研究的统一流程。基于 Nextflow 构建，源自开放神经影像社区。',
+      rights: '© 2026 OmniPrep 贡献者。保留所有权利。',
+      spirit: '秉承开放、可复现的神经影像科学精神构建。',
+      docsLinks: [
+        ['快速开始', '/zh/getting-started/'],
+        ['安装', '/zh/getting-started/#installation'],
+        ['参数参考', '/zh/documentation/'],
+        ['示例', '/zh/documentation/#examples'],
+        ['更新日志', '/zh/changelog/'],
+      ],
+      projLinks: [
+        ['关于 OmniPrep', '/zh/about/'],
+        ['路线图', '/zh/about/#roadmap'],
+        ['引用', '/zh/about/#citation'],
+        ['致谢', '/zh/about/#acknowledgements'],
+      ],
+      commLinks: [
+        ['联系', '/zh/about/#contact'],
+        ['参与贡献', '/zh/about/#contributing'],
+      ],
+    }
+  : {
+      docs: 'Documentation',
+      project: 'Project',
+      community: 'Community',
+      tagline:
+        'A unified pipeline for accelerating large-scale multimodal MRI research across the lifespan. Built on Nextflow, powered by the neuroimaging community.',
+      rights: '© 2026 OmniPrep Contributors. All rights reserved.',
+      spirit: 'Built in the spirit of open, reproducible neuroimaging science.',
+      docsLinks: [
+        ['Getting Started', '/getting-started/'],
+        ['Installation', '/getting-started/#installation'],
+        ['Parameter Reference', '/documentation/'],
+        ['Examples', '/documentation/#examples'],
+        ['Changelog', '/changelog/'],
+      ],
+      projLinks: [
+        ['About OmniPrep', '/about/'],
+        ['Roadmap', '/about/#roadmap'],
+        ['Citation', '/about/#citation'],
+        ['Acknowledgements', '/about/#acknowledgements'],
+      ],
+      commLinks: [
+        ['Contact', '/about/#contact'],
+        ['Contributing', '/about/#contributing'],
+      ],
+    };
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <div>
+      <div class="footer-brand">
+        <img class="brand-mark" src={`${baseUrl}/assets/img/logo-white.svg`} alt="OmniPrep logo" />
+        <div class="brand-name">Omni<span>Prep</span></div>
+      </div>
+      <p class="footer-about">{t.tagline}</p>
+    </div>
+    <div class="footer-col">
+      <h4>{t.docs}</h4>
+      <ul>
+        {t.docsLinks.map(([label, path]) => (
+          <li><a href={href(path)}>{label}</a></li>
+        ))}
+        <li><a href={repoUrl} target="_blank" rel="noopener">GitHub ↗</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>{t.project}</h4>
+      <ul>
+        {t.projLinks.map(([label, path]) => (
+          <li><a href={href(path)}>{label}</a></li>
+        ))}
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>{t.community}</h4>
+      <ul>
+        {t.commLinks.map(([label, path]) => (
+          <li><a href={href(path)}>{label}</a></li>
+        ))}
+      </ul>
+    </div>
+  </div>
+  <div class="container">
+    <div class="footer-bottom">
+      <span>{t.rights}</span>
+      <span>{t.spirit}</span>
+    </div>
+  </div>
+</footer>

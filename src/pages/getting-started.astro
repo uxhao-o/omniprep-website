@@ -1,0 +1,188 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { site } from '../config';
+const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
+---
+<Layout lang="en" title="Getting Started — OmniPrep" description="OmniPrep — unified multimodal MRI preprocessing and analysis pipeline." active="start">
+
+    <section class="page-hero">
+      <div class="container">
+        <div class="breadcrumb"><a href={`${baseUrl}/`}>Home</a><span class="sep">/</span>Getting Started</div>
+        <h1>Getting Started</h1>
+        <p class="lead">Install OmniPrep, obtain a FreeSurfer license, and preprocess your first BIDS dataset in minutes.</p>
+      </div>
+    </section>
+
+    <section class="docs-layout container">
+      <aside class="toc">
+        <div class="toc-title">On this page</div>
+        <ul>
+          <li><a class="level-1" href="#requirements">Requirements</a></li>
+          <li><a class="level-1" href="#installation">Installation</a></li>
+          <li><a href="#docker">Docker</a></li>
+          <li><a href="#singularity">Singularity / Apptainer</a></li>
+          <li><a class="level-1" href="#license">FreeSurfer license</a></li>
+          <li><a class="level-1" href="#quickstart">Quick start</a></li>
+          <li><a class="level-1" href="#examples">Run examples</a></li>
+          <li><a href="#ex-all">All modalities</a></li>
+          <li><a href="#ex-bold">BOLD only (existing Recon)</a></li>
+          <li><a class="level-1" href="#output">Output structure</a></li>
+        </ul>
+      </aside>
+
+      <article class="doc-content prose">
+
+        <section id="requirements">
+          <h2>Requirements</h2>
+          <p>OmniPrep ships as a self-contained container image, so most dependencies are bundled. You will need:</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Requirement</th><th>Purpose</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Docker</strong> (or Singularity / Apptainer)</td><td>Container runtime to execute the workflow.</td></tr>
+                <tr><td><strong>FreeSurfer license file</strong></td><td>Required for anatomical reconstruction. Free — register at <a href="https://surfer.nmr.mgh.harvard.edu/registration.html" target="_blank" rel="noopener">surfer.nmr.mgh.harvard.edu</a>.</td></tr>
+                <tr><td><strong>BIDS-formatted dataset</strong></td><td>Input data organized according to the <a href="https://bids.neuroimaging.io/" target="_blank" rel="noopener">BIDS</a> standard.</td></tr>
+                <tr><td><strong>GPU (optional)</strong></td><td>Accelerates eligible steps. CPU fallback is supported via <code>--device cpu</code>.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout note">
+            <svg class="ci" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            <p><strong>Storage note:</strong> multimodal preprocessing generates large intermediate files. Use <code>--remove_temp_files</code> when disk space is limited.</p>
+          </div>
+        </section>
+
+        <section id="installation">
+          <h2>Installation</h2>
+          <p>Pull the latest OmniPrep image. No compilation is required.</p>
+
+          <h3 id="docker">Docker</h3>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">bash</span><button class="copy-btn">Copy</button></div>
+            <pre><code>docker pull uxhao/omniprep:latest</code></pre>
+          </div>
+          <p>Verify the image and print the built-in help:</p>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">bash</span><button class="copy-btn">Copy</button></div>
+            <pre><code>docker run --rm uxhao/omniprep:latest --help</code></pre>
+          </div>
+
+          <h3 id="singularity">Singularity / Apptainer</h3>
+          <p>Build a Singularity image from the Docker image, or use a pre-built <code>.simg</code>:</p>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">bash</span><button class="copy-btn">Copy</button></div>
+            <pre><code>singularity pull omniprep.simg docker://uxhao/omniprep:latest</code></pre>
+          </div>
+        </section>
+
+        <section id="license">
+          <h2>FreeSurfer license</h2>
+          <p>
+            OmniPrep requires a valid FreeSurfer license file (<code>license.txt</code>) for anatomical
+            reconstruction. It is <strong>free</strong> to obtain:
+          </p>
+          <ol class="steps">
+            <li>
+              <h4>Register for a license</h4>
+              <p>Fill in the registration form at <a href="https://surfer.nmr.mgh.harvard.edu/registration.html" target="_blank" rel="noopener">surfer.nmr.mgh.harvard.edu/registration.html</a>.</p>
+            </li>
+            <li>
+              <h4>Download <code>license.txt</code></h4>
+              <p>You will receive the license by email. Save it to a known path on your host.</p>
+            </li>
+            <li>
+              <h4>Mount it into the container</h4>
+              <p>Pass the license path with <code>--fs_license_file</code> (see the quick start below).</p>
+            </li>
+          </ol>
+          <div class="callout warn">
+            <svg class="ci" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <p><strong>Do not redistribute the license.</strong> Each user must obtain their own. OmniPrep never bundles a license.</p>
+          </div>
+        </section>
+
+        <section id="quickstart">
+          <h2>Quick start</h2>
+          <p>The minimal run needs three mounts: the BIDS data, the output directory, and your FreeSurfer license.</p>
+
+          <h3>Docker</h3>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">bash — Docker</span><button class="copy-btn">Copy</button></div>
+            <pre><code>docker run -it --rm [--gpus all] \
+  -v /path/to/bids:/data \
+  -v /path/to/output:/out \
+  -v /path/to/fs_license.txt:/license.txt \
+  uxhao/omniprep:latest /data /out participant \
+  --fs_license_file /license.txt \
+  --tasks "anat bold dwi"</code></pre>
+          </div>
+
+          <h3>Singularity / Apptainer</h3>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">bash — Singularity</span><button class="copy-btn">Copy</button></div>
+            <pre><code>singularity run [-nv] \
+  --bind /path/to/bids:/data \
+  --bind /path/to/output:/out \
+  --bind /path/to/fs_license.txt:/license.txt \
+  omniprep.simg \
+  --fs_license_file /license.txt \
+  --tasks "anat bold dwi"</code></pre>
+          </div>
+
+          <div class="callout tip">
+            <svg class="ci" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <p><strong>Tip:</strong> running with no arguments launches the interactive Streamlit web UI. Running with one argument (<code>--help</code>) prints the full parameter reference.</p>
+          </div>
+        </section>
+
+        <section id="examples">
+          <h2>Run examples</h2>
+
+          <h3 id="ex-all">Preprocess all modalities for every subject</h3>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">bash</span><button class="copy-btn">Copy</button></div>
+            <pre><code>omniprep-docker /data /out participant \
+  --fs_license_file /opt/freesurfer/license.txt \
+  --tasks "anat bold dwi" \
+  [options]</code></pre>
+          </div>
+
+          <h3 id="ex-bold">BOLD only, reusing existing structural derivatives</h3>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">bash</span><button class="copy-btn">Copy</button></div>
+            <pre><code>omniprep-docker /data /out participant \
+  --fs_license_file /opt/freesurfer/license.txt \
+  --tasks "bold" \
+  --subjects_dir /out/Recon \
+  --participant_label "sub-001 sub-002" \
+  [options]</code></pre>
+          </div>
+          <p>
+            When <code>anat</code> is omitted from <code>--tasks</code>, BOLD and DWI workflows still need structural
+            derivatives (T1w, masks, surfaces, segmentations, parcellations). Provide them via
+            <code>--subjects_dir</code>; if unspecified, the default is
+            <code>output_dir/derivatives/omniprep/Recon</code>.
+          </p>
+        </section>
+
+        <section id="output">
+          <h2>Output structure</h2>
+          <p>All derivatives are written under <code>output_dir/derivatives/omniprep</code>:</p>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">text</span><button class="copy-btn">Copy</button></div>
+            <pre><code>output_dir/
+└── derivatives/
+    └── omniprep/
+        ├── Recon/        # FreeSurfer structural derivatives
+        ├── BOLD/         # denoised BOLD + voxel/ROI metrics
+        ├── DWI/          # DTI/CSD metrics, tractography, connectomes
+        ├── QC/           # run report, trace, timeline
+        └── WorkDir/      # Nextflow work & runtime state</code></pre>
+          </div>
+          <p>See the <a href="/documentation/">Documentation</a> page for the complete parameter reference and more examples.</p>
+        </section>
+
+      </article>
+    </section>
+  
+</Layout>

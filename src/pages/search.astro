@@ -1,0 +1,22 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { site } from '../config';
+const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
+---
+<Layout lang="en" title="Search — OmniPrep" description="Search the OmniPrep documentation." active="">
+  <section class="page-hero">
+    <div class="container">
+      <div class="breadcrumb"><a href={`${baseUrl}/`}>Home</a><span class="sep">/</span>Search</div>
+      <h1>Search the docs</h1>
+      <p class="lead">Type keywords to search the full OmniPrep documentation.</p>
+    </div>
+  </section>
+  <div class="container" style="max-width:860px;padding:40px 24px 80px">
+    <div id="search"></div>
+  </div>
+  <script>
+    import { PagefindUI } from '@pagefind/default-ui';
+    import '@pagefind/default-ui/css/ui.css';
+    new PagefindUI({ element: "#search", showSubResults: true });
+  </script>
+</Layout>

@@ -1,0 +1,912 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { site } from '../config';
+const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
+---
+<Layout lang="en" title="Documentation — OmniPrep Parameter Reference" description="OmniPrep — unified multimodal MRI preprocessing and analysis pipeline." active="docs">
+
+    <section class="page-hero">
+      <div class="container">
+        <div class="breadcrumb"><a href={`${baseUrl}/`}>Home</a><span class="sep">/</span>Documentation</div>
+        <h1>Parameter Reference</h1>
+        <p class="lead">The complete command-line interface of OmniPrep, organized by category. Every option is documented with its type, default value, and behavior.</p>
+      </div>
+    </section>
+
+    <div class="docs-layout container">
+      <aside class="toc">
+        <div class="toc-title">On this page</div>
+        <ul>
+          <li><a class="level-1" href="#usage">Usage</a></li>
+          <li><a class="level-1" href="#required">Required options</a></li>
+          <li><a class="level-1" href="#general-options">General options</a></li>
+          <li><a class="level-1" href="#atlas-options">Atlas &amp; ROI options</a></li>
+          <li><a class="level-1" href="#bold-options">BOLD fMRI options</a></li>
+          <li><a href="#bold-basic">BOLD basics</a></li>
+          <li><a href="#bold-spatial">Spaces &amp; resampling</a></li>
+          <li><a href="#bold-motion">Motion &amp; scrubbing</a></li>
+          <li><a href="#bold-denoise">Denoising</a></li>
+          <li><a href="#bold-metrics">Metrics &amp; ROI</a></li>
+          <li><a class="level-1" href="#dwi-options">DWI options</a></li>
+          <li><a href="#dwi-basic">DWI basics</a></li>
+          <li><a href="#dwi-tensor">DTI &amp; CSD</a></li>
+          <li><a href="#dwi-track">Tractography</a></li>
+          <li><a href="#dwi-connectome">Connectome</a></li>
+          <li><a class="level-1" href="#examples">Examples</a></li>
+        </ul>
+      </aside>
+
+      <article class="doc-content">
+
+        <section id="usage">
+          <h2>Usage</h2>
+          <p class="lead-copy">OmniPrep is invoked as a container entrypoint. The positional arguments are the BIDS directory, output directory, and analysis level.</p>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">usage</span><button class="copy-btn">Copy</button></div>
+            <pre><code>omniprep-docker       [bids_dir] [output_dir] [&#123;participant&#125;] [options]
+omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options]</code></pre>
+          </div>
+          <p>Options are passed as <code>--flag</code> or <code>--flag value</code>. Boolean options (e.g. <code>--resume</code>, <code>--bold_denoise</code>) are enabled by their presence; values with spaces (task lists, atlas lists, metric lists) must be wrapped in double quotes.</p>
+          <div class="callout note">
+            <svg class="ci" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            <p><strong>Interactive mode:</strong> running with <em>no</em> arguments launches the Streamlit web UI. Running with exactly one argument prints this full help text.</p>
+          </div>
+        </section>
+
+        <section id="required">
+          <h2>Required options</h2>
+          <div class="param" id="p-fs_license_file">
+            <div class="param-head">
+              <span class="param-name">--fs_license_file <span class="arg">&lt;PATH&gt;</span></span>
+              <span class="badge badge-required">required</span>
+              <span class="badge badge-type">string</span>
+            </div>
+            <div class="param-desc">
+              <p>Path to the FreeSurfer license file. This is the only strictly required option.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="general-options">
+          <h2>General options</h2>
+
+          <div class="param" id="p-tasks">
+            <div class="param-head">
+              <span class="param-name">--tasks <span class="arg">"anat bold dwi"</span></span>
+              <span class="badge badge-default">default: "anat bold dwi"</span>
+            </div>
+            <div class="param-desc">
+              <p>Specify which preprocessing workflows to run. Multiple tasks must be enclosed in double quotes and separated by spaces.</p>
+              <ul>
+                <li><code>anat</code> — T1w structural MRI preprocessing</li>
+                <li><code>bold</code> — BOLD fMRI preprocessing</li>
+                <li><code>dwi</code> — diffusion MRI preprocessing</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="param" id="p-age_group">
+            <div class="param-head">
+              <span class="param-name">--age_group <span class="arg">&#123;adult|pediatric|infant&#125;</span></span>
+              <span class="badge badge-default">default: adult</span>
+            </div>
+            <div class="param-desc">
+              <p>Specify the participant age group for age-appropriate MRI preprocessing.</p>
+              <ul>
+                <li><code>infant</code> — under 2 years</li>
+                <li><code>pediatric</code> — 2 to under 18 years</li>
+                <li><code>adult</code> — 18 years and older</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="param" id="p-participant_label">
+            <div class="param-head">
+              <span class="param-name">--participant_label <span class="arg">"sub-001 sub-002 ..."</span></span>
+              <span class="badge badge-type">string</span>
+            </div>
+            <div class="param-desc">
+              <p>Specify one or more participants to process. If this option is not provided, all participants in the BIDS directory will be processed.</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-exclude_participant_label">
+            <div class="param-head">
+              <span class="param-name">--exclude_participant_label <span class="arg">"sub-003 sub-004 ..."</span></span>
+              <span class="badge badge-type">string</span>
+            </div>
+            <div class="param-desc">
+              <p>Specify participants to exclude from processing. If specified, the designated participants will be ignored.</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-subjects_dir">
+            <div class="param-head">
+              <span class="param-name">--subjects_dir <span class="arg">&lt;PATH&gt;</span></span>
+              <span class="badge badge-default">default: output_dir/derivatives/omniprep/Recon</span>
+            </div>
+            <div class="param-desc">
+              <p>Path to a pre-existing T1w derivatives directory.</p>
+              <p>This option is required if <code>anat</code> is <em>not</em> included in <code>--tasks</code> but BOLD or DWI preprocessing is requested, because BOLD and DWI workflows depend on structural derivatives such as T1w images, masks, surfaces, segmentations, and parcellations. If no path is specified, <code>output_dir/derivatives/omniprep/Recon</code> is used by default.</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-skip_bids_validation">
+            <div class="param-head">
+              <span class="param-name">--skip_bids_validation</span>
+              <span class="badge badge-flag">flag</span>
+            </div>
+            <div class="param-desc">
+              <p>Skip BIDS validation. By default, OmniPrep validates the input dataset as a BIDS dataset before processing. Use this option only if you are confident that the input data are organized correctly or if validation is handled externally.</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-remove_temp_files">
+            <div class="param-head">
+              <span class="param-name">--remove_temp_files</span>
+              <span class="badge badge-flag">flag</span>
+            </div>
+            <div class="param-desc">
+              <p>Remove intermediate files generated during workflow execution. This helps reduce disk usage, especially for large multimodal datasets. Recommended if storage space is limited.</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-device">
+            <div class="param-head">
+              <span class="param-name">--device <span class="arg">&#123;auto|cpu|0|1|2|...&#125;</span></span>
+              <span class="badge badge-default">default: auto</span>
+            </div>
+            <div class="param-desc">
+              <p>Specify the compute device.</p>
+              <ul>
+                <li><code>auto</code> — automatically select available compute devices.</li>
+                <li><code>cpu</code> — disable GPU acceleration and run GPU-capable steps on CPU where supported.</li>
+                <li><code>0, 1, 2, ...</code> — run GPU-enabled steps on the specified GPU device ID.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="param" id="p-cpus">
+            <div class="param-head">
+              <span class="param-name">--cpus <span class="arg">&#123;auto|8|16|20|...&#125;</span></span>
+              <span class="badge badge-default">default: auto</span>
+            </div>
+            <div class="param-desc">
+              <p>Maximum number of CPU cores available to the workflow.</p>
+              <p>When set to <code>auto</code>, OmniPrep automatically detects the total number of CPU cores in the runtime environment and uses that value for Nextflow. When customizing, ensure the value you set does not exceed the actual number of CPU cores.</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-memory">
+            <div class="param-head">
+              <span class="param-name">--memory <span class="arg">&#123;auto|16|24|32|64|...&#125;</span></span>
+              <span class="badge badge-default">default: auto</span>
+            </div>
+            <div class="param-desc">
+              <p>Maximum memory available to the workflow, in GB.</p>
+              <p>When set to <code>auto</code>, OmniPrep automatically detects the amount of memory available in the runtime environment and allocates 90% of it to Nextflow.</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-nthreads">
+            <div class="param-head">
+              <span class="param-name">--nthreads <span class="arg">&lt;N&gt;</span></span>
+              <span class="badge badge-default">default: 8</span>
+            </div>
+            <div class="param-desc">
+              <p>Number of threads used by multi-threaded applications. Set to <code>0</code> to disable explicit multi-threading control. If this value is too high, efficiency will actually decrease, so <code>8</code> is recommended.</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-ignore_error">
+            <div class="param-head">
+              <span class="param-name">--ignore_error</span>
+              <span class="badge badge-flag">flag</span>
+            </div>
+            <div class="param-desc">
+              <p>Continue the workflow when selected non-critical errors are encountered. Useful for large datasets, but use with caution — failed derivatives may be missing for some subjects.</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-resume">
+            <div class="param-head">
+              <span class="param-name">--resume</span>
+              <span class="badge badge-flag">flag</span>
+            </div>
+            <div class="param-desc">
+              <p>Resume a previous Nextflow run. Completed tasks will be reused from the cache instead of being recomputed. Use this after an unexpected termination to avoid re-running already-completed tasks.</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-no_qc">
+            <div class="param-head">
+              <span class="param-name">--no_qc</span>
+              <span class="badge badge-flag">flag</span>
+            </div>
+            <div class="param-desc">
+              <p>Disable generation of the quality control results, including all QC documents.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="atlas-options">
+          <h2>Atlas &amp; ROI-level derivative options</h2>
+
+          <div class="param" id="p-atlases">
+            <div class="param-head">
+              <span class="param-name">--atlases <span class="arg">"DK Glasser Schaefer200P7N Brainnetome"</span></span>
+              <span class="badge badge-type">string</span>
+            </div>
+            <div class="param-desc">
+              <p>Specify the brain atlas or atlases to use for atlas-based outputs. Multiple atlases must be enclosed in double quotes and separated by spaces.</p>
+              <p><strong>Built-in atlases:</strong></p>
+              <div class="pill-row">
+                <span class="pill hl">DK</span>
+                <span class="pill hl">DKT40</span>
+                <span class="pill hl">a2009s</span>
+                <span class="pill hl">Glasser</span>
+                <span class="pill hl">Schaefer100-1000</span>
+                <span class="pill hl">Brainnetome</span>
+              </div>
+              <p style="margin-top:12px"><strong>Atlas-based outputs may include:</strong></p>
+              <ul>
+                <li>T1w ROI-level morphometric features</li>
+                <li>BOLD ROI time series</li>
+                <li>ROI Pearson functional connectivity</li>
+                <li>DWI structural connectomes</li>
+              </ul>
+              <p>If a custom atlas is used, provide the required atlas files (such as GCS or ANNOT files, LUT files, and reordered LUT files), and map them to <code>/opt/atlas</code> inside the Docker container.</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-add_subcortical">
+            <div class="param-head">
+              <span class="param-name">--add_subcortical</span>
+              <span class="badge badge-flag">flag</span>
+            </div>
+            <div class="param-desc">
+              <p>Include subcortical regions in atlas-based outputs.</p>
+              <ul>
+                <li>For cortical-only atlases, OmniPrep can append 21 FreeSurfer-defined subcortical regions. See the LUT files under <code>omniprep/atlas/LUT</code> in the source code for details.</li>
+                <li>For atlases that provide their own subcortical parcellation, a corresponding <code>.gca</code> file (named <code>AtlasName.gca</code>) or NIfTI subcortical file (named <code>AtlasName_space-MNI152XXX-subcortex.nii.gz</code>, where <code>MNI152XXX</code> is the associated MNI space name) must be provided. Map these files to the <code>/opt/atlas/</code> path within the Docker container.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="param" id="p-subcortex_synthmorph_atlases">
+            <div class="param-head">
+              <span class="param-name">--subcortex_synthmorph_atlases <span class="arg">"Brainnetome"</span></span>
+              <span class="badge badge-type">string</span>
+            </div>
+            <div class="param-desc">
+              <p>Specify atlas names whose subcortical parcellation is provided as a NIfTI image and should be transformed using SynthMorph. Use this option when a custom atlas includes a subcortical NIfTI file, for example <code>AtlasName_space-MNI152XXX-subcortex.nii.gz</code>. The file should be mapped to <code>/opt/atlas</code> inside the Docker container.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="bold-options">
+          <h2>BOLD fMRI options</h2>
+
+          <h3 id="bold-basic">BOLD basics</h3>
+
+          <div class="param" id="p-bold_task_type">
+            <div class="param-head">
+              <span class="param-name">--bold_task_type <span class="arg">"task1 task2 task3 ..."</span></span>
+              <span class="badge badge-type">string</span>
+            </div>
+            <div class="param-desc">
+              <p>Specify BOLD task names to process, such as <code>"rest"</code> or task-specific names. Multiple tasks should be enclosed in double quotes and separated by spaces.</p>
+              <p>Example: <code>--bold_task_type "rest nback"</code></p>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_skip_frame">
+            <div class="param-head">
+              <span class="param-name">--bold_skip_frame <span class="arg">&lt;N&gt;</span></span>
+              <span class="badge badge-default">default: 0</span>
+            </div>
+            <div class="param-desc">
+              <p>Number of initial BOLD volumes to remove before denoising. Commonly used to remove non-steady-state volumes affected by unstable MR signal.</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_sdc">
+            <div class="param-head">
+              <span class="param-name">--bold_sdc</span>
+              <span class="badge badge-flag">flag</span>
+            </div>
+            <div class="param-desc">
+              <p>Apply susceptibility distortion correction (SDC) for BOLD fMRI when fieldmap or suitable distortion-correction information is available.</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_cifti">
+            <div class="param-head">
+              <span class="param-name">--bold_cifti</span>
+              <span class="badge badge-flag">flag</span>
+            </div>
+            <div class="param-desc">
+              <p>Generate CIFTI-format BOLD outputs. The default CIFTI output space is the HCP-style <code>91k</code> grayordinate space. Disabled by default unless this option is specified.</p>
+            </div>
+          </div>
+
+          <h3 id="bold-spatial">Spaces &amp; resampling</h3>
+
+          <div class="param" id="p-bold_surface_spaces">
+            <div class="param-head">
+              <span class="param-name">--bold_surface_spaces <span class="arg">&lt;SPACE&gt;</span></span>
+              <span class="badge badge-default">default: fsaverage6</span>
+            </div>
+            <div class="param-desc">
+              <p>Specify the surface template space for BOLD surface outputs.</p>
+              <p><strong>Supported values:</strong></p>
+              <div class="pill-row">
+                <span class="pill hl">fsnative</span>
+                <span class="pill hl">fsaverage</span>
+                <span class="pill hl">fsaverage1</span>
+                <span class="pill hl">fsaverage2</span>
+                <span class="pill hl">fsaverage3</span>
+                <span class="pill hl">fsaverage4</span>
+                <span class="pill hl">fsaverage5</span>
+                <span class="pill hl">fsaverage6</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_output_space">
+            <div class="param-head">
+              <span class="param-name">--bold_output_space <span class="arg">&lt;SPACE:res-N&gt;</span></span>
+              <span class="badge badge-default">default: MNI152NLin6Asym:res-2</span>
+            </div>
+            <div class="param-desc">
+              <p>Specify the template space and resolution for volumetric BOLD outputs. Supports optional cohort and resolution settings.</p>
+              <p><strong>Registration strategy:</strong></p>
+              <ul>
+                <li><strong>Adults:</strong> direct registration from T1w to the specified output space.</li>
+                <li><strong>Infants and children:</strong> an age-appropriate MNIInfant or MNIPediatric cohort is automatically selected based on <code>age_months</code>.
+                  <ul>
+                    <li>If the selected cohort matches the output space, register directly from T1w to that space (single-stage).</li>
+                    <li>Otherwise, register from T1w to the age-matched cohort, then to the specified output space (two-stage).</li>
+                  </ul>
+                </li>
+              </ul>
+              <p>All transforms are combined to resample BOLD only once.</p>
+              <p><strong>Age detection (<code>age_months</code>):</strong> automatically read age from BIDS <code>sessions.tsv</code> (preferred) or <code>participants.tsv</code>. Supported fields: <code>age_days</code> &gt; <code>age_weeks</code> &gt; <code>age_months</code> &gt; <code>age</code> (years). All ages are converted to months (<code>age_months</code>).</p>
+              <p><strong>Age-specific templates:</strong></p>
+              <ul>
+                <li>Under 5 years — <code>MNIInfant</code> (age-matched cohort).</li>
+                <li>5 to under 18 years — <code>MNIPediatricAsym</code> (age-matched cohort).</li>
+                <li>18 years and older — Adult template.</li>
+              </ul>
+              <p><strong>Examples:</strong></p>
+              <div class="pill-row">
+                <span class="pill hl">MNI152NLin6Asym:res-2</span>
+                <span class="pill hl">MNI152NLin2009cAsym:res-2</span>
+                <span class="pill hl">MNIInfant:cohort-4:res-2</span>
+                <span class="pill hl">MNIPediatricAsym:cohort-2:res-2</span>
+              </div>
+            </div>
+          </div>
+
+          <h3 id="bold-motion">Motion &amp; scrubbing</h3>
+
+          <div class="param" id="p-bold_confounds">
+            <div class="param-head">
+              <span class="param-name">--bold_confounds</span>
+              <span class="badge badge-flag">flag</span>
+            </div>
+            <div class="param-desc">
+              <p>Compute BOLD confound regressors, including motion parameters, tissue-based signals, outlier regressors, and other nuisance variables used for BOLD denoising.</p>
+              <p>OmniPrep generates the <code>motion_outlier_XXX</code> parameters for motion frame detection. The Power method is used for motion frame detection by default, with a threshold of 0.2 for framewise displacement (FD).</p>
+              <p>This option is automatically enabled when <code>--bold_denoise</code>, <code>--bold_roi_timeseries</code>, or <code>--bold_roi_pearson_fc</code> is enabled.</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_scrubbing">
+            <div class="param-head">
+              <span class="param-name">--bold_scrubbing</span>
+              <span class="badge badge-flag">flag</span>
+            </div>
+            <div class="param-desc">
+              <p>Once scrubbing is enabled, OmniPrep processes motion frames during the denoising step of the post-processing workflow, in accordance with the strategy defined by the <code>bold_scrubbing_strategy</code> variable. The motion frame markers are defined by the <code>motion_outlier_XXX</code> and <code>scrub_fd_XXX_0pX_mask</code> values in the confounds file.</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_scrubbing_strategy">
+            <div class="param-head">
+              <span class="param-name">--bold_scrubbing_strategy <span class="arg">&#123;regression|interpolation&#125;</span></span>
+              <span class="badge badge-default">default: regression</span>
+            </div>
+            <div class="param-desc">
+              <p>Specify the scrubbing strategy. Currently, only the <code>regression</code> and <code>interpolation</code> methods are supported.</p>
+              <ul>
+                <li><code>regression</code> — the motion frames will be regressed out during the regression of the covariates.</li>
+                <li><code>interpolation</code> — the motion frames will be processed using the PCHIP method.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_fd_type">
+            <div class="param-head">
+              <span class="param-name">--bold_fd_type <span class="arg">&#123;power|jenkinson&#125;</span></span>
+              <span class="badge badge-default">default: power</span>
+            </div>
+            <div class="param-desc">
+              <p>Specify the type of FD used to detect motion frames. Currently, the <code>power</code> and <code>jenkinson</code> methods are supported.</p>
+              <ul>
+                <li><code>power</code> — the FD value is stored in the <code>framewise_displacement</code> field of the confounds file.</li>
+                <li><code>jenkinson</code> — the value is stored in the <code>rmsd</code> field of the confounds file.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_fd_threshold">
+            <div class="param-head">
+              <span class="param-name">--bold_fd_threshold <span class="arg">&lt;N&gt;</span></span>
+              <span class="badge badge-default">default: 0.2</span>
+            </div>
+            <div class="param-desc">
+              <p>Specify the threshold for FD. When this threshold is exceeded, the frame is considered to be a motion frame.</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_scrubbing_prev">
+            <div class="param-head">
+              <span class="param-name">--bold_scrubbing_prev <span class="arg">&lt;N&gt;</span></span>
+              <span class="badge badge-default">default: 0</span>
+            </div>
+            <div class="param-desc">
+              <p>Number of volumes preceding each detected motion outlier to additionally mark as outliers.</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_scrubbing_later">
+            <div class="param-head">
+              <span class="param-name">--bold_scrubbing_later <span class="arg">&lt;N&gt;</span></span>
+              <span class="badge badge-default">default: 0</span>
+            </div>
+            <div class="param-desc">
+              <p>Number of BOLD volumes following each detected motion outlier that will also be marked as outliers. A value of <code>0</code> disables forward temporal expansion.</p>
+            </div>
+          </div>
+
+          <h3 id="bold-denoise">Denoising</h3>
+
+          <div class="param" id="p-bold_denoise">
+            <div class="param-head">
+              <span class="param-name">--bold_denoise</span>
+              <span class="badge badge-flag">flag</span>
+            </div>
+            <div class="param-desc">
+              <p>Perform BOLD denoising based on the generated confound regressors. Depending on the selected options, this may include nuisance regression, detrending, temporal filtering, and removal of initial volumes (<code>--bold_skip_frame</code>).</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_denoise_strategy">
+            <div class="param-head">
+              <span class="param-name">--bold_denoise_strategy <span class="arg">&lt;STRATEGY&gt;</span></span>
+              <span class="badge badge-default">default: motion24_wm_csf</span>
+            </div>
+            <div class="param-desc">
+              <p>Specify the BOLD denoising strategy.</p>
+              <ul>
+                <li><code>motion6</code> — six rigid-body motion parameters: <code>trans_x</code>, <code>trans_y</code>, <code>trans_z</code>, <code>rot_x</code>, <code>rot_y</code>, <code>rot_z</code>.</li>
+                <li><code>motion24</code> — Friston-24 motion model: six motion parameters, their temporal derivatives, squared terms, and squared derivatives.</li>
+                <li><code>motion24_wm_csf</code> — Friston-24 motion regressors plus white matter and CSF regressors, including derivatives and squared terms.</li>
+                <li><code>motion24_wm_csf_gsr</code> — Friston-24 motion regressors plus white matter, CSF, and global signal regressors. Includes global signal regression and should be used with explicit methodological justification or sensitivity analysis.</li>
+                <li><code>acompcor6_motion24</code> — the first six anatomical CompCor components plus Friston-24 motion regressors.</li>
+                <li><code>acompcor6_motion24_wm_csf</code> — the first six anatomical CompCor components plus Friston-24 motion regressors, white matter, and CSF regressors.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_denoise_n_compcor">
+            <div class="param-head">
+              <span class="param-name">--bold_denoise_n_compcor <span class="arg">&lt;N&gt;</span></span>
+              <span class="badge badge-default">default: 6</span>
+            </div>
+            <div class="param-desc">
+              <p>Number of anatomical CompCor components to use when an aCompCor-based denoising strategy is selected. For example, if this value is <code>6</code>, the first six aCompCor components will be used. This parameter only affects strategies containing <code>acompcor</code>.</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_filter_mode">
+            <div class="param-head">
+              <span class="param-name">--bold_filter_mode <span class="arg">&#123;bandpass|cosine|none&#125;</span></span>
+              <span class="badge badge-default">default: bandpass</span>
+            </div>
+            <div class="param-desc">
+              <p>Specify the temporal filtering mode used during BOLD denoising.</p>
+              <ul>
+                <li><code>bandpass</code> — apply explicit temporal band-pass filtering using <code>--bold_bandpass</code> and exclude fMRIPrep-style cosine regressors.</li>
+                <li><code>cosine</code> — use fMRIPrep-style cosine regressors for high-pass drift removal and disable explicit high-pass/low-pass filtering.</li>
+                <li><code>none</code> — do not use cosine regressors and do not apply explicit temporal filtering.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_bandpass">
+            <div class="param-head">
+              <span class="param-name">--bold_bandpass <span class="arg">"0.01-0.08"</span></span>
+              <span class="badge badge-default">default: "0.01-0.08"</span>
+            </div>
+            <div class="param-desc">
+              <p>Temporal band-pass frequency range in Hz. Used only when <code>--bold_filter_mode</code> is set to <code>"bandpass"</code>.</p>
+              <p>Example: <code>--bold_bandpass 0.01-0.08</code> means high-pass = 0.01 Hz, low-pass = 0.08 Hz.</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_smooth_fwhm">
+            <div class="param-head">
+              <span class="param-name">--bold_smooth_fwhm <span class="arg">"0"</span></span>
+              <span class="badge badge-default">default: "0"</span>
+            </div>
+            <div class="param-desc">
+              <p>Spatial smoothing kernel size in millimeters, specified as full width at half maximum (FWHM). Use <code>"0"</code> to disable smoothing. Multiple values can be provided to generate multiple smoothed BOLD outputs from the same denoised BOLD image.</p>
+              <p><strong>Examples:</strong> <code>--bold_smooth_fwhm "0"</code>, <code>--bold_smooth_fwhm "4"</code>, <code>--bold_smooth_fwhm "4 6 8"</code></p>
+            </div>
+          </div>
+
+          <h3 id="bold-metrics">Metrics &amp; ROI</h3>
+
+          <div class="param" id="p-bold_metrics">
+            <div class="param-head">
+              <span class="param-name">--bold_metrics <span class="arg">"reho alff malff zalff falff int"</span></span>
+              <span class="badge badge-type">string</span>
+            </div>
+            <div class="param-desc">
+              <p>Specify one or more BOLD metrics to calculate. Multiple metrics should be provided as a space-separated string.</p>
+              <ul>
+                <li><code>reho</code> — regional homogeneity, measuring local synchronization of neighboring voxel time series using Kendall's W.</li>
+                <li><code>alff</code> — amplitude of low-frequency fluctuations within the configured frequency band.</li>
+                <li><code>malff</code> — mean-normalized ALFF, calculated by dividing voxelwise ALFF by the mean ALFF within the analysis mask.</li>
+                <li><code>zalff</code> — Z-score-normalized ALFF, calculated by standardizing voxelwise ALFF values within the analysis mask.</li>
+                <li><code>falff</code> — fractional ALFF, calculated as the ratio of low-frequency amplitude to the amplitude across the full available frequency range.</li>
+                <li><code>int</code> — intrinsic neural timescale, estimated from the temporal autocorrelation of the BOLD signal.</li>
+              </ul>
+              <p><strong>Notes:</strong> ReHo is calculated using the time series from which motion frames have been removed. However, the ALFF metrics (and their derivatives) and INT are calculated using the complete sequence, with no motion frames removed.</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_alff_bandpass">
+            <div class="param-head">
+              <span class="param-name">--bold_alff_bandpass <span class="arg">"0.01-0.08"</span></span>
+              <span class="badge badge-default">default: "0.01-0.08"</span>
+            </div>
+            <div class="param-desc">
+              <p>Specifies the frequency range from which low-frequency amplitudes are extracted during ALFF/fALFF frequency-domain calculations.</p>
+              <p>Note that this differs from <code>--bold_bandpass</code>, which is used for time-domain bandpass filtering of BOLD signals. <code>--bold_alff_bandpass</code> is used solely for ALFF/fALFF spectral calculations.</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_roi_metrics">
+            <div class="param-head">
+              <span class="param-name">--bold_roi_metrics</span>
+              <span class="badge badge-flag">flag</span>
+            </div>
+            <div class="param-desc">
+              <p>Enable atlas-based ROI summarization of the requested BOLD metrics. For each configured brain atlas, voxelwise metric values are aggregated within each ROI and saved as region-level tabular outputs. When this option is not enabled, only voxelwise metric maps are generated.</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_roi_timeseries">
+            <div class="param-head">
+              <span class="param-name">--bold_roi_timeseries</span>
+              <span class="badge badge-flag">flag</span>
+            </div>
+            <div class="param-desc">
+              <p>Extract atlas-based BOLD ROI time series from denoised BOLD images. Requires <code>--atlas</code> and is automatically enabled when <code>--bold_roi_pearson_fc</code> is enabled.</p>
+              <p>The output is saved as an N × T matrix (rows = ROIs, columns = time points). The saved ROI time-series file contains no header, no index, and no ROI label column.</p>
+              <p><strong>Notes:</strong> although the time series retains the full timeline, only valid frames that have not been identified as motion artefacts are used to calculate the mean and standard deviation of each ROI for z-score normalisation.</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_roi_pearson_fc">
+            <div class="param-head">
+              <span class="param-name">--bold_roi_pearson_fc</span>
+              <span class="badge badge-flag">flag</span>
+            </div>
+            <div class="param-desc">
+              <p>After excluding any time points flagged as abnormal motion, calculate the Pearson correlation coefficient between two valid ROI time series to construct a static functional connectivity matrix.</p>
+              <p>This option automatically enables <code>--bold_roi_timeseries</code>, <code>--bold_denoise</code>, and <code>--bold_confounds</code>.</p>
+              <p>The output is an N × N ROI functional connectivity matrix without header or ROI labels.</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_roi_fc_censoring">
+            <div class="param-head">
+              <span class="param-name">--bold_roi_fc_censoring</span>
+              <span class="badge badge-flag">flag</span>
+            </div>
+            <div class="param-desc">
+              <p>Controls whether to physically censor (remove) motion frames when computing static functional connectivity. If omitted, the correlation matrix is computed on the full-length time series, where motion frames have been processed according to the specified <code>--bold_scrubbing_strategy</code>.</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_roi_fc_fisherz">
+            <div class="param-head">
+              <span class="param-name">--bold_roi_fc_fisherz</span>
+              <span class="badge badge-flag">flag</span>
+            </div>
+            <div class="param-desc">
+              <p>Save Fisher-z-transformed Pearson FC values instead of raw Pearson correlation coefficients. Recommended for group-level statistical analysis, edge-wise statistical tests, regression models, or group-average FC calculation. If FC matrices are used directly as graph edge weights for machine learning or GNN models, raw Pearson correlations may be preferable.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="dwi-options">
+          <h2>DWI options</h2>
+
+          <h3 id="dwi-basic">DWI basics</h3>
+
+          <div class="param" id="p-dwi_task_type">
+            <div class="param-head">
+              <span class="param-name">--dwi_task_type <span class="arg">"task1 task2 task3 ..."</span></span>
+              <span class="badge badge-type">string</span>
+            </div>
+            <div class="param-desc">
+              <p>Specify DWI task or acquisition labels to process when multiple DWI acquisitions are present. Multiple values should be enclosed in double quotes and separated by spaces.</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-dwi_sdc_method">
+            <div class="param-head">
+              <span class="param-name">--dwi_sdc_method <span class="arg">&#123;auto|pepolar|fieldmap|synb0|none&#125;</span></span>
+              <span class="badge badge-default">default: auto</span>
+            </div>
+            <div class="param-desc">
+              <p>Specify the susceptibility distortion correction (SDC) method for DWI.</p>
+              <ul>
+                <li><code>auto</code> — automatically select the best available method based on BIDS metadata and participant age.
+                  <ul>
+                    <li>Adults: <code>pepolar</code> &gt; <code>fieldmap</code> &gt; <code>synb0</code> &gt; <code>none</code>.</li>
+                    <li>Infants/Children: <code>pepolar</code> &gt; <code>fieldmap</code> &gt; <code>none</code>.</li>
+                  </ul>
+                </li>
+                <li><code>pepolar</code> — use reverse phase-encoded b0 images for correction (FSL TOPUP).</li>
+                <li><code>fieldmap</code> — use GRE-based field maps for distortion correction.</li>
+                <li><code>synb0</code> — use Synb0-DISCO to synthesize an undistorted b0 image for correction. Supported for adults only.</li>
+                <li><code>none</code> — disable susceptibility distortion correction.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="param" id="p-dwi_volume_res">
+            <div class="param-head">
+              <span class="param-name">--dwi_volume_res <span class="arg">&#123;native|02|03|...&#125;</span></span>
+              <span class="badge badge-default">default: 02</span>
+            </div>
+            <div class="param-desc">
+              <p>Specify DWI volumetric output resolution.</p>
+              <ul>
+                <li><code>native</code> — keep the native DWI resolution.</li>
+                <li><code>01, 02, 03, ...</code> — resample DWI derivatives to the specified isotropic resolution in millimeters.</li>
+              </ul>
+            </div>
+          </div>
+
+          <h3 id="dwi-tensor">DTI &amp; CSD</h3>
+
+          <div class="param" id="p-dwi_cal_dti">
+            <div class="param-head">
+              <span class="param-name">--dwi_cal_dti</span>
+              <span class="badge badge-flag">flag</span>
+            </div>
+            <div class="param-desc">
+              <p>Compute diffusion tensor imaging metrics.</p>
+              <p>Automatically enabled when tensor-based tractography is requested with <code>--fiber_track_algorithm "tensor_prob"</code>, and when FA-weighted connectomes are requested with <code>--dwi_fa_connectome</code>.</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-dwi_dti_metrics">
+            <div class="param-head">
+              <span class="param-name">--dwi_dti_metrics <span class="arg">"fa md ad rd cl cp cs"</span></span>
+              <span class="badge badge-type">string</span>
+            </div>
+            <div class="param-desc">
+              <p>Specify DTI metrics to compute. This parameter only controls which DTI metrics are generated — DTI metrics are computed only when <code>--dwi_cal_dti</code> is enabled (or automatically enabled by a dependent option).</p>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Metric</th><th>Description</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>fa</code></td><td>fractional anisotropy</td></tr>
+                    <tr><td><code>md</code></td><td>mean diffusivity</td></tr>
+                    <tr><td><code>ad</code></td><td>axial diffusivity</td></tr>
+                    <tr><td><code>rd</code></td><td>radial diffusivity</td></tr>
+                    <tr><td><code>cl</code></td><td>linear anisotropy</td></tr>
+                    <tr><td><code>cp</code></td><td>planar anisotropy</td></tr>
+                    <tr><td><code>cs</code></td><td>spherical anisotropy</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="param" id="p-dwi_cal_csd">
+            <div class="param-head">
+              <span class="param-name">--dwi_cal_csd</span>
+              <span class="badge badge-flag">flag</span>
+            </div>
+            <div class="param-desc">
+              <p>Estimate fiber orientation distributions using constrained spherical deconvolution (CSD).</p>
+              <p>Automatically enabled when FOD-based tractography algorithms are selected (<code>ifod2</code>, <code>sd_stream</code>). Therefore, if any of <code>--fiber_track_algorithm "ifod2"</code>, <code>--fiber_track_algorithm "sd_stream"</code>, or <code>--fiber_track_algorithm "ifod2 sd_stream"</code> is specified, OmniPrep will automatically enable CSD calculation if <code>--dwi_cal_csd</code> has not been explicitly specified.</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-dwi_csd_metrics">
+            <div class="param-head">
+              <span class="param-name">--dwi_csd_metrics <span class="arg">"wmfod"</span></span>
+              <span class="badge badge-type">string</span>
+            </div>
+            <div class="param-desc">
+              <p>Specify CSD-related outputs to generate when CSD calculation is enabled. Typical outputs may include white matter fiber orientation distributions and related tissue response components, depending on the current implementation.</p>
+            </div>
+          </div>
+
+          <h3 id="dwi-track">Tractography</h3>
+
+          <div class="param" id="p-dwi_fiber_track">
+            <div class="param-head">
+              <span class="param-name">--dwi_fiber_track</span>
+              <span class="badge badge-flag">flag</span>
+            </div>
+            <div class="param-desc">
+              <p>Perform whole-brain tractography. Automatically enabled when any of <code>--dwi_create_connectome</code>, <code>--dwi_fa_connectome</code>, or <code>--fiber_track_sift2</code> is enabled. If tractography is enabled but no tracking algorithm is specified, OmniPrep uses <code>ifod2</code>.</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-fiber_track_algorithm">
+            <div class="param-head">
+              <span class="param-name">--fiber_track_algorithm <span class="arg">"ifod2"</span></span>
+              <span class="badge badge-default">default: "ifod2"</span>
+            </div>
+            <div class="param-desc">
+              <p>Specify the tractography algorithm or algorithms. Multiple tracking algorithms can be specified simultaneously by enclosing them in double quotes and separating them with spaces.</p>
+              <ul>
+                <li><code>ifod2</code> — probabilistic FOD-based tractography using second-order integration over fiber orientation distributions. Requires CSD.</li>
+                <li><code>sd_stream</code> — deterministic FOD-based streamline tractography based on spherical deconvolution. Requires CSD.</li>
+                <li><code>tensor_prob</code> — probabilistic tensor-based tractography. Requires DTI.</li>
+              </ul>
+              <p><strong>Examples:</strong> <code>--fiber_track_algorithm "ifod2"</code>, <code>"ifod2 sd_stream"</code>, <code>"ifod2 sd_stream tensor_prob"</code></p>
+            </div>
+          </div>
+
+          <div class="param" id="p-fiber_track_select">
+            <div class="param-head">
+              <span class="param-name">--fiber_track_select <span class="arg">&lt;N&gt;</span></span>
+              <span class="badge badge-default">default: 10000000</span>
+            </div>
+            <div class="param-desc">
+              <p>Number of streamlines to generate or select during tractography.</p>
+              <p>Tractography is currently CPU-based and can be one of the most time-consuming steps in OmniPrep.</p>
+              <ul>
+                <li><strong>Routine processing:</strong> 5,000,000 streamlines provides a practical balance between computational cost and tractography quality.</li>
+                <li><strong>Higher-quality connectomes:</strong> 10,000,000 streamlines may be used if sufficient computing time is available.</li>
+                <li><strong>Testing/debugging:</strong> this value can be reduced, e.g. <code>--fiber_track_select 200000</code>.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="param" id="p-fiber_track_minlength">
+            <div class="param-head">
+              <span class="param-name">--fiber_track_minlength <span class="arg">&lt;N&gt;</span></span>
+              <span class="badge badge-default">default: 5</span>
+            </div>
+            <div class="param-desc">
+              <p>Minimum streamline length in millimeters.</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-fiber_track_maxlength">
+            <div class="param-head">
+              <span class="param-name">--fiber_track_maxlength <span class="arg">&lt;N&gt;</span></span>
+              <span class="badge badge-default">default: 250</span>
+            </div>
+            <div class="param-desc">
+              <p>Maximum streamline length in millimeters.</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-fiber_track_sift2">
+            <div class="param-head">
+              <span class="param-name">--fiber_track_sift2</span>
+              <span class="badge badge-flag">flag</span>
+            </div>
+            <div class="param-desc">
+              <p>Apply SIFT2 to estimate streamline weights after tractography. This option automatically enables <code>--dwi_fiber_track</code>. Note that OmniPrep currently uses iFOD2-based tractography for SIFT2-weighted derivatives if <code>ifod2</code> is not included in <code>--fiber_track_algorithm</code>.</p>
+            </div>
+          </div>
+
+          <h3 id="dwi-connectome">Connectome</h3>
+
+          <div class="param" id="p-dwi_create_connectome">
+            <div class="param-head">
+              <span class="param-name">--dwi_create_connectome</span>
+              <span class="badge badge-flag">flag</span>
+            </div>
+            <div class="param-desc">
+              <p>Construct atlas-based structural connectivity matrices from tractography outputs. Requires an atlas to be specified with <code>--atlases "DK Brainnetome Glasser ..."</code>.</p>
+              <p>Automatically enables <code>--dwi_fiber_track</code> and <code>--dwi_cal_csd</code>. Note that OmniPrep currently constructs structural connectomes based on iFOD2 tractography if <code>ifod2</code> is not included in <code>--fiber_track_algorithm</code>.</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-dwi_fa_connectome">
+            <div class="param-head">
+              <span class="param-name">--dwi_fa_connectome</span>
+              <span class="badge badge-flag">flag</span>
+            </div>
+            <div class="param-desc">
+              <p>Compute FA-weighted structural connectivity matrices. Automatically enables <code>--dwi_cal_dti</code>, <code>--dwi_create_connectome</code>, and <code>--dwi_fiber_track</code>.</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-tck2conn_scale_invnodevol">
+            <div class="param-head">
+              <span class="param-name">--tck2conn_scale_invnodevol</span>
+              <span class="badge badge-flag">flag</span>
+            </div>
+            <div class="param-desc">
+              <p>Apply inverse node-volume scaling during structural connectome construction. This option can reduce the influence of ROI size on connectivity estimates by scaling connection weights according to the inverse volume of the connected nodes.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="examples">
+          <h2>Examples</h2>
+
+          <h3>Run multimodal preprocessing for all subjects</h3>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">bash</span><button class="copy-btn">Copy</button></div>
+            <pre><code>omniprep-docker /data /out participant \
+  --fs_license_file /opt/freesurfer/license.txt \
+  --tasks "anat bold dwi" \
+  [options]</code></pre>
+          </div>
+
+          <h3>Run only BOLD preprocessing for selected subjects using existing structural derivatives</h3>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">bash</span><button class="copy-btn">Copy</button></div>
+            <pre><code>omniprep-docker /data /out participant \
+  --fs_license_file /opt/freesurfer/license.txt \
+  --tasks "bold" \
+  --subjects_dir /out/Recon \
+  --participant_label "sub-001 sub-002" \
+  [options]</code></pre>
+          </div>
+
+          <h3>Full BOLD derivatives: denoising, metrics, and functional connectome</h3>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">bash</span><button class="copy-btn">Copy</button></div>
+            <pre><code>omniprep-docker /data /out participant \
+  --fs_license_file /opt/freesurfer/license.txt \
+  --tasks "bold" \
+  --bold_task_type "rest" \
+  --bold_denoise \
+  --bold_denoise_strategy motion24_wm_csf \
+  --bold_filter_mode bandpass \
+  --bold_bandpass "0.01-0.08" \
+  --bold_metrics "reho alff falff" \
+  --atlases "DK Brainnetome" \
+  --bold_roi_pearson_fc \
+  --bold_roi_fc_fisherz</code></pre>
+          </div>
+
+          <h3>DWI: CSD tractography and a structural connectome</h3>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">bash</span><button class="copy-btn">Copy</button></div>
+            <pre><code>omniprep-docker /data /out participant \
+  --fs_license_file /opt/freesurfer/license.txt \
+  --tasks "dwi" \
+  --dwi_sdc_method auto \
+  --fiber_track_algorithm "ifod2" \
+  --fiber_track_select 10000000 \
+  --atlases "DK Brainnetome" \
+  --dwi_create_connectome \
+  --tck2conn_scale_invnodevol</code></pre>
+          </div>
+        </section>
+
+      </article>
+    </div>
+  
+</Layout>

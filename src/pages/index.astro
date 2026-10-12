@@ -1,0 +1,250 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { site } from '../config';
+const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
+---
+<Layout lang="en" title="OmniPrep — A Unified Pipeline for Accelerating Large-Scale Multimodal MRI Research Across the Lifespan" description="OmniPrep — unified multimodal MRI preprocessing and analysis pipeline." active="home">
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="container">
+        <span class="hero-badge"><span class="dot"></span> Multi-modal · Scalable · Reproducible</span>
+        <h1><span class="grad">Unified Pipeline for Multimodal MRI Processing</span> Across the Lifespan</h1>
+        <p class="hero-sub">
+            OmniPrep unifies sMRI, dMRI, and fMRI preprocessing and downstream analysis, from atlas-based ROI features to connectomics, accelerated by deep learning and parallel computing.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href={`${baseUrl}/getting-started/`}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            Get Started
+          </a>
+          <a class="btn btn-ghost" href={`${baseUrl}/documentation/`}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+            Read the Docs
+          </a>
+        </div>
+
+        <div class="hero-terminal">
+          <div class="terminal-bar">
+            <span class="tdot r"></span><span class="tdot y"></span><span class="tdot g"></span>
+            <span class="terminal-title">bash — omniprep</span>
+          </div>
+          <div class="terminal-body">
+            <span class="p">$</span> <span class="k">docker run</span> <span class="o">-it --rm --gpus all</span><span class="cont">\</span><br />
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="o">-v /path/to/bids:/data -v /path/to/output:/out</span><span class="cont">\</span><br />
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="o">-v /path/to/license.txt:/license.txt</span><span class="cont">\</span><br />
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="s">uxhao/omniprep:latest</span> <span class="o">/data /out participant</span><span class="cont">\</span><br />
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="o">--fs_license_file /license.txt</span> <span class="o">--tasks</span> <span class="s">"anat bold dwi"</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">Why OmniPrep</span>
+          <h2>OmniPrep in a nutshell</h2>
+          <p class="lead">One command from raw BIDS data to analysis-ready derivatives, across every MRI modality.</p>
+        </div>
+        <div class="grid grid-3">
+          <div class="card">
+            <div class="card-icon blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            </div>
+            <h3>Unified Multimodal</h3>
+            <p>Structural (sMRI), functional (fMRI), and diffusion (dMRI) preprocessing in a single, coherent workflow — no stitching tools together.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon teal">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            </div>
+            <h3>Built on Nextflow</h3>
+            <p>Reproducible, containerized, and resumable. Scale from a laptop to HPC clusters and cloud with the same command line.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon orange">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+            </div>
+            <h3>Atlas &amp; ROI Derivatives</h3>
+            <p>Built-in cortical atlases, subcortical parcellation, morphometric features, ROI time series, functional and structural connectomes.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <h3>Quality Control Built-in</h3>
+            <p>Automated QC reports, trace, and timeline generated with every run — motion scrubbing, FD-based frame detection included.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v16M4 4h16M4 4l16 16"/><rect x="2" y="2" width="20" height="20" rx="2" opacity="0"/></svg>
+            </div>
+            <h3>Age-Aware Templates</h3>
+            <p>Adult, pediatric, and infant cohorts with automatic age detection and matching MNI templates and distortion-correction strategies.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon teal">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4M4.2 4.2l2.8 2.8M17 17l2.8 2.8M4.2 19.8L7 17M17 7l2.8-2.8"/></svg>
+            </div>
+            <h3>GPU Accelerated</h3>
+            <p>Automatically leverages available GPUs for eligible steps, with transparent CPU fallback and a supervised GPU daemon.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATS -->
+    <section class="stats">
+      <div class="container">
+        <div class="stat">
+          <div class="stat-num">3</div>
+          <div class="stat-label">MRI modalities</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">6<span class="unit">+</span></div>
+          <div class="stat-label">Built-in atlases</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">60<span class="unit">+</span></div>
+          <div class="stat-label">Configuration options</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">2</div>
+          <div class="stat-label">Container runtimes</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODALITIES -->
+    <section class="section soft">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">Three modalities, one pipeline</span>
+          <h2>End-to-end multimodal workflows</h2>
+          <p class="lead">Enable the tasks you need with the <code style="font-family:var(--font-mono)">--tasks</code> flag — dependencies between modalities are handled automatically.</p>
+        </div>
+        <div class="modality">
+          <div class="modality-card anat">
+            <span class="modality-badge">anat</span>
+            <h3>Structural MRI</h3>
+            <div class="sub">T1w preprocessing &amp; reconstruction</div>
+            <p>FreeSurfer-based cortical reconstruction and segmentation, producing surfaces, parcellations, and atlas-level morphometric features.</p>
+            <ul>
+              <li>FreeSurfer reconstruction</li>
+              <li>ROI-level morphometry</li>
+              <li>Native &amp; MNI-space surfaces</li>
+            </ul>
+            <a class="more" href="documentation.html#general-options">Learn more →</a>
+          </div>
+          <div class="modality-card bold">
+            <span class="modality-badge">bold</span>
+            <h3>Functional MRI</h3>
+            <div class="sub">BOLD preprocessing &amp; derivatives</div>
+            <p>Full BOLD denoising chain with motion scrubbing, nuisance regression, temporal filtering, and a rich set of voxel- and ROI-level metrics.</p>
+            <ul>
+              <li>ReHo, ALFF/fALFF, INT</li>
+              <li>ROI time series &amp; FC matrices</li>
+              <li>CIFTI &amp; surface outputs</li>
+            </ul>
+            <a class="more" href="documentation.html#bold-options">Learn more →</a>
+          </div>
+          <div class="modality-card dwi">
+            <span class="modality-badge">dwi</span>
+            <h3>Diffusion MRI</h3>
+            <div class="sub">DWI preprocessing, tractography &amp; connectomics</div>
+            <p>Distortion correction, DTI and CSD metrics, whole-brain tractography (iFOD2, SD-Stream, tensor), and structural connectomes.</p>
+            <ul>
+              <li>DTI &amp; CSD metrics</li>
+              <li>Whole-brain tractography</li>
+              <li>Structural connectomes</li>
+            </ul>
+            <a class="more" href="documentation.html#dwi-options">Learn more →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUICK START -->
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">Quick start</span>
+          <h2>Run in three steps</h2>
+          <p class="lead">From raw BIDS data to derivatives in minutes.</p>
+        </div>
+        <div class="grid grid-2" style="align-items:start">
+          <div>
+            <ol class="steps">
+              <li>
+                <h4>Pull the container image</h4>
+                <p>Get the pre-built OmniPrep image from Docker Hub.</p>
+                <div class="code-block">
+                  <div class="cb-head"><span class="cb-label">bash</span><button class="copy-btn">Copy</button></div>
+                  <pre><code>docker pull uxhao/omniprep:latest</code></pre>
+                </div>
+              </li>
+              <li>
+                <h4>Prepare your BIDS dataset &amp; license</h4>
+                <p>Point OmniPrep at your BIDS directory and a FreeSurfer license file.</p>
+              </li>
+              <li>
+                <h4>Launch the pipeline</h4>
+                <p>Run the workflow with the modalities you need.</p>
+                <div class="code-block">
+                  <div class="cb-head"><span class="cb-label">bash</span><button class="copy-btn">Copy</button></div>
+                  <pre><code>docker run -it --rm --gpus all \
+  -v /path/to/bids:/data \
+  -v /path/to/output:/out \
+  -v /path/to/license.txt:/license.txt \
+  uxhao/omniprep:latest /data /out participant \
+  --fs_license_file /license.txt \
+  --tasks "anat bold dwi"</code></pre>
+                </div>
+              </li>
+            </ol>
+          </div>
+          <div>
+            <div class="card" style="box-shadow:var(--shadow-md)">
+              <h3 style="display:flex;align-items:center;gap:9px">
+                <span class="card-icon green" style="margin:0;width:34px;height:34px"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>
+                What you get
+              </h3>
+              <p>OmniPrep writes a BIDS-derivatives-compatible tree under <code style="font-family:var(--font-mono)">output_dir/derivatives/omniprep</code>, including:</p>
+              <div class="pill-row">
+                <span class="pill hl">Recon/</span>
+                <span class="pill hl">BOLD/</span>
+                <span class="pill hl">DWI/</span>
+                <span class="pill hl">QC/</span>
+                <span class="pill">report.html</span>
+                <span class="pill">timeline.html</span>
+              </div>
+              <ul style="margin-top:16px;padding-left:20px;color:var(--muted);font-size:.93rem">
+                <li>FreeSurfer reconstruction &amp; morphometry</li>
+                <li>Denoised BOLD + voxel/ROI metrics</li>
+                <li>Tractography &amp; connectomes</li>
+                <li>Automated QC reports</li>
+              </ul>
+              <a class="btn btn-primary" style="margin-top:16px" href={`${baseUrl}/getting-started/`}>View full guide →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="section soft">
+      <div class="container" style="text-align:center;max-width:720px">
+        <h2>Ready to preprocess at scale?</h2>
+        <p class="lead" style="color:var(--muted);margin-bottom:28px">
+          Read the documentation to explore every option, or jump straight into installation.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href={`${baseUrl}/documentation/`}>Browse Documentation</a>
+          <a class="btn btn-ghost" href={`${baseUrl}/about/`}>About the Project</a>
+        </div>
+      </div>
+    </section>
+  
+</Layout>

@@ -1,0 +1,45 @@
+---
+import '../styles/style.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+const {
+  lang = 'en',
+  title = 'OmniPrep — A Unified Pipeline for Accelerating Large-Scale Multimodal MRI Research Across the Lifespan',
+  description = 'OmniPrep is a unified multimodal MRI (sMRI / fMRI / dMRI) preprocessing and analysis pipeline built on Nextflow, delivering reproducible, atlas- and ROI-level derivatives at scale.',
+  active = 'home',
+} = Astro.props;
+const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
+---
+
+<!DOCTYPE html>
+<html lang={lang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href={`${baseUrl}/assets/img/logo.svg`} />
+    <script is:inline>
+      // Apply saved theme before paint to avoid flashing.
+      (function () {
+        var saved = localStorage.getItem('op-theme');
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.dataset.theme = saved || (prefersDark ? 'dark' : 'light');
+      })();
+    </script>
+  </head>
+  <body>
+    <Header lang={lang} active={active} />
+    <main>
+      <slot />
+    </main>
+    <Footer lang={lang} />
+
+    <button class="to-top" aria-label="Back to top">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+    </button>
+
+    <script is:inline src={`${baseUrl}/assets/js/main.js`}></script>
+  </body>
+</html>

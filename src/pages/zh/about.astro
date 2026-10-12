@@ -1,0 +1,130 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { repoUrl, site } from '../../config';
+const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
+---
+<Layout lang="zh" title="关于 — OmniPrep" description="OmniPrep 统一多模态 MRI 预处理与分析流程。" active="about">
+<section class="page-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href={`${baseUrl}/zh/`}>首页</a><span class="sep">/</span>关于 OmniPrep</div>
+    <h1>关于 OmniPrep</h1>
+    <p class="lead">一个用于加速全生命周期大规模多模态 MRI 研究的统一Pipeline</p>
+  </div>
+</section>
+
+<section class="docs-layout container">
+      <aside class="toc">
+        <div class="toc-title">本页目录</div>
+        <ul>
+          <li><a class="level-1" href="#overview">概览</a></li>
+          <li><a class="level-1" href="#principles">设计原则</a></li>
+          <li><a class="level-1" href="#roadmap">路线图</a></li>
+          <li><a class="level-1" href="#citation">引用</a></li>
+          <li><a class="level-1" href="#acknowledgements">致谢</a></li>
+          <li><a class="level-1" href="#contributing">贡献</a></li>
+          <li><a class="level-1" href="#contact">联系</a></li>
+        </ul>
+      </aside>
+      <article class="doc-content prose">
+<h1>关于 OmniPrep</h1>
+<div class="callout abstract">
+<svg class="ci" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>
+<p><strong>标语</strong> A Unified Pipeline for Accelerating Large-Scale Multimodal MRI Research Across the Lifespan.</p>
+</div>
+<h2 id="overview">概览</h2>
+<p>OmniPrep 是一个统一的神经影像流程，在单一连贯的工作流中标准化并预处理<br />
+<strong>结构（sMRI）</strong>、<strong>功能（fMRI）</strong>和<strong>弥散（dMRI）</strong> MRI 数据。它基于<br />
+<a href="https://www.nextflow.io/">Nextflow</a> 构建，容器化、可续跑，能够从单机扩展到大型 HPC 集群与云端。</p>
+<p>除预处理外，OmniPrep 还生成分析就绪的衍生数据：图集级与 ROI 级形态学特征、体素级与 ROI 级功能指标（ReHo、ALFF/fALFF、INT、时间序列、功能连接），以及弥散衍生的纤维追踪与结构连接组——均内置质量控制。</p>
+<h2 id="principles">设计原则</h2>
+<div class="grid grid-2">
+            <div class="card">
+              <div class="card-icon blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2v20M2 12h20"/></svg>
+              </div>
+              <h3>统一</h3>
+              <p>一个命令、一个配置面、一套输出规范，覆盖 sMRI、fMRI 与 dMRI。</p>
+            </div>
+            <div class="card">
+              <div class="card-icon teal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              </div>
+              <h3>可扩展</h3>
+              <p>Nextflow 在本地、集群与云端执行器之间调度，无需改变接口。</p>
+            </div>
+            <div class="card">
+              <div class="card-icon orange">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+              </div>
+              <h3>稳健</h3>
+              <p>自动年龄检测、自适应模板与畸变校正策略、可续跑、选择性容错。</p>
+            </div>
+            <div class="card">
+              <div class="card-icon green">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </div>
+              <h3>可复现</h3>
+              <p>容器化依赖、BIDS 输入、标准化衍生数据、版本化 QC 产物。</p>
+            </div>
+          </div>
+<h2 id="roadmap">路线图</h2>
+<table>
+<thead>
+<tr>
+<th>里程碑</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>多模态预处理（sMRI / fMRI / dMRI）</td>
+<td><span class="badge badge-flag">进行中</span></td>
+</tr>
+<tr>
+<td>图集与 ROI 衍生数据（形态学、时间序列、FC、连接组）</td>
+<td><span class="badge badge-flag">进行中</span></td>
+</tr>
+<tr>
+<td>自动化 QC（报告、trace、时间线、头动 scrubbing）</td>
+<td><span class="badge badge-flag">进行中</span></td>
+</tr>
+<tr>
+<td>交互式 Web 界面（Streamlit）</td>
+<td><span class="badge badge-default">计划中</span></td>
+</tr>
+<tr>
+<td>扩展图集目录</td>
+<td><span class="badge badge-default">计划中</span></td>
+</tr>
+<tr>
+<td>组级工作流</td>
+<td><span class="badge badge-default">计划中</span></td>
+</tr>
+</tbody>
+</table>
+<h2 id="citation">引用</h2>
+<p>如果你在研究中使用 OmniPrep，请引用本项目（及其所依赖的上游工具）。正式引用将在论文发表后补充。</p>
+<pre><code class="language-bibtex">@software&#123;omniprep,
+  title   = &#123;OmniPrep: A Unified Pipeline for Accelerating Large-Scale Multimodal MRI Research Across the Lifespan&#125;,
+  author  = &#123;OmniPrep Contributors&#125;,
+  year    = &#123;2026&#125;,
+  url     = &#123;${repoUrl}&#125;
+&#125;
+</code></pre>
+<h2 id="acknowledgements">致谢</h2>
+<p>OmniPrep 基于并深深受益于开放神经影像社区。关键依赖与灵感来源包括：</p>
+<ul>
+<li><a href="https://surfer.nmr.mgh.harvard.edu/">FreeSurfer</a> — 皮层重建与分割</li>
+<li><a href="https://fmriprep.org/">fMRIPrep</a> / <a href="https://www.nipreps.org/">NiPreps</a> — 预处理方法学</li>
+<li><a href="https://www.nextflow.io/">Nextflow</a> — 工作流编排</li>
+<li><a href="https://fsl.fmrib.ox.ac.uk/">FSL</a> 与 <a href="https://mrtrix.readthedocs.io/">MRtrix3</a> — 畸变校正、纤维追踪、连接组学</li>
+<li><a href="https://bids.neuroimaging.io/">BIDS</a> — OmniPrep 消费并遵循的数据标准</li>
+<li>Power 等人 — 头动帧检测方法学</li>
+</ul>
+<h2 id="contributing">贡献</h2>
+<p>OmniPrep 以开放方式开发。欢迎贡献——bug 报告、功能请求、文档改进与 pull request。请遵循项目的贡献指南。</p>
+<h2 id="contact">联系</h2>
+<p>如有问题、反馈或合作意向，请在仓库提 issue 或联系维护者。</p>
+      </article>
+    </section>
+</Layout>

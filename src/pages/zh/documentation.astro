@@ -1,0 +1,912 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { site } from '../../config';
+const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
+---
+<Layout lang="zh" title="文档 — OmniPrep 参数参考" description="OmniPrep — 统一多模态 MRI 预处理与分析流程。" active="docs">
+
+    <section class="page-hero">
+      <div class="container">
+        <div class="breadcrumb"><a href={`${baseUrl}/zh/`}>首页</a><span class="sep">/</span>参数参考</div>
+        <h1>参数参考</h1>
+        <p class="lead">OmniPrep 完整命令行接口，按类别组织。每个选项均标注类型、默认值与行为说明。</p>
+      </div>
+    </section>
+
+    <div class="docs-layout container">
+      <aside class="toc">
+        <div class="toc-title">本页目录</div>
+        <ul>
+          <li><a class="level-1" href="#usage">用法</a></li>
+          <li><a class="level-1" href="#required">必需选项</a></li>
+          <li><a class="level-1" href="#general-options">通用选项</a></li>
+          <li><a class="level-1" href="#atlas-options">图集与 ROI 选项</a></li>
+          <li><a class="level-1" href="#bold-options">BOLD fMRI 选项</a></li>
+          <li><a href="#bold-basic">BOLD 基础</a></li>
+          <li><a href="#bold-spatial">空间与重采样</a></li>
+          <li><a href="#bold-motion">头动与 Scrubbing</a></li>
+          <li><a href="#bold-denoise">去噪</a></li>
+          <li><a href="#bold-metrics">指标与 ROI</a></li>
+          <li><a class="level-1" href="#dwi-options">DWI 选项</a></li>
+          <li><a href="#dwi-basic">DWI 基础</a></li>
+          <li><a href="#dwi-tensor">DTI 与 CSD</a></li>
+          <li><a href="#dwi-track">纤维追踪</a></li>
+          <li><a href="#dwi-connectome">连接组</a></li>
+          <li><a class="level-1" href="#examples">示例</a></li>
+        </ul>
+      </aside>
+
+      <article class="doc-content">
+
+        <section id="usage">
+          <h2>用法</h2>
+          <p class="lead-copy">OmniPrep 以容器入口点方式调用。位置参数依次为 BIDS 目录、输出目录和分析级别。</p>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">用法</span><button class="copy-btn">复制</button></div>
+            <pre><code>omniprep-docker       [bids_dir] [output_dir] [&#123;participant&#125;] [options]
+omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options]</code></pre>
+          </div>
+          <p>选项以 <code>--flag</code> 或 <code>--flag value</code> 形式传入。布尔选项（如 <code>--resume</code>、<code>--bold_denoise</code>）出现即启用；含空格的值（任务列表、图集列表、指标列表）必须用双引号包裹。</p>
+          <div class="callout note">
+            <svg class="ci" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            <p><strong>交互模式：</strong>不带任何参数运行时会启动 Streamlit 网页界面；恰好带一个参数运行时，会打印完整的帮助文本。</p>
+          </div>
+        </section>
+
+        <section id="required">
+          <h2>必需选项</h2>
+          <div class="param" id="p-fs_license_file">
+            <div class="param-head">
+              <span class="param-name">--fs_license_file <span class="arg">&lt;PATH&gt;</span></span>
+              <span class="badge badge-required">必需</span>
+              <span class="badge badge-type">字符串</span>
+            </div>
+            <div class="param-desc">
+              <p>FreeSurfer 许可证文件路径。这是唯一严格必需的选项。</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="general-options">
+          <h2>通用选项</h2>
+
+          <div class="param" id="p-tasks">
+            <div class="param-head">
+              <span class="param-name">--tasks <span class="arg">"anat bold dwi"</span></span>
+              <span class="badge badge-default">默认："anat bold dwi"</span>
+            </div>
+            <div class="param-desc">
+              <p>指定要运行的预处理工作流。多个任务必须用双引号包裹并以空格分隔。</p>
+              <ul>
+                <li><code>anat</code> — T1w 结构像 MRI 预处理</li>
+                <li><code>bold</code> — BOLD 功能像 fMRI 预处理</li>
+                <li><code>dwi</code> — 弥散 MRI 预处理</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="param" id="p-age_group">
+            <div class="param-head">
+              <span class="param-name">--age_group <span class="arg">&#123;adult|pediatric|infant&#125;</span></span>
+              <span class="badge badge-default">默认：adult</span>
+            </div>
+            <div class="param-desc">
+              <p>指定被试年龄组，以选择适龄的 MRI 预处理流程。</p>
+              <ul>
+                <li><code>infant</code> — 2 岁以下</li>
+                <li><code>pediatric</code> — 2 岁至 18 岁以下</li>
+                <li><code>adult</code> — 18 岁及以上</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="param" id="p-participant_label">
+            <div class="param-head">
+              <span class="param-name">--participant_label <span class="arg">"sub-001 sub-002 ..."</span></span>
+              <span class="badge badge-type">字符串</span>
+            </div>
+            <div class="param-desc">
+              <p>指定要处理的一个或多个被试。若未提供该选项，将处理 BIDS 目录中的全部被试。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-exclude_participant_label">
+            <div class="param-head">
+              <span class="param-name">--exclude_participant_label <span class="arg">"sub-003 sub-004 ..."</span></span>
+              <span class="badge badge-type">字符串</span>
+            </div>
+            <div class="param-desc">
+              <p>指定要从处理中排除的被试。设置后这些被试将被忽略。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-subjects_dir">
+            <div class="param-head">
+              <span class="param-name">--subjects_dir <span class="arg">&lt;PATH&gt;</span></span>
+              <span class="badge badge-default">默认：output_dir/derivatives/omniprep/Recon</span>
+            </div>
+            <div class="param-desc">
+              <p>已有的 T1w 衍生数据目录路径。</p>
+              <p>当 <code>--tasks</code> 中<em>不</em>包含 <code>anat</code> 但请求 BOLD 或 DWI 预处理时，此选项为必需，因为 BOLD 与 DWI 工作流依赖 T1w 图像、掩膜、表面、分割与分区等结构衍生数据。若未指定路径，默认使用 <code>output_dir/derivatives/omniprep/Recon</code>。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-skip_bids_validation">
+            <div class="param-head">
+              <span class="param-name">--skip_bids_validation</span>
+              <span class="badge badge-flag">开关</span>
+            </div>
+            <div class="param-desc">
+              <p>跳过 BIDS 校验。默认情况下，OmniPrep 在处理前会先验证输入数据集是否符合 BIDS 规范。仅当你确认数据组织正确，或校验已在外部完成时才使用此选项。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-remove_temp_files">
+            <div class="param-head">
+              <span class="param-name">--remove_temp_files</span>
+              <span class="badge badge-flag">开关</span>
+            </div>
+            <div class="param-desc">
+              <p>删除工作流执行过程中产生的中间文件，有助于减少磁盘占用，对大规模多模态数据集尤其有用。存储空间有限时推荐启用。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-device">
+            <div class="param-head">
+              <span class="param-name">--device <span class="arg">&#123;auto|cpu|0|1|2|...&#125;</span></span>
+              <span class="badge badge-default">默认：auto</span>
+            </div>
+            <div class="param-desc">
+              <p>指定计算设备。</p>
+              <ul>
+                <li><code>auto</code> — 自动选择可用的计算设备。</li>
+                <li><code>cpu</code> — 禁用 GPU 加速，在支持的步骤中改用 CPU 运行。</li>
+                <li><code>0, 1, 2, ...</code> — 在指定编号的 GPU 设备上运行支持 GPU 的步骤。</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="param" id="p-cpus">
+            <div class="param-head">
+              <span class="param-name">--cpus <span class="arg">&#123;auto|8|16|20|...&#125;</span></span>
+              <span class="badge badge-default">默认：auto</span>
+            </div>
+            <div class="param-desc">
+              <p>工作流可使用的最大 CPU 核心数。</p>
+              <p>设为 <code>auto</code> 时，OmniPrep 自动检测运行环境的 CPU 核心总数并传给 Nextflow。自定义时请确保不超过实际核心数。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-memory">
+            <div class="param-head">
+              <span class="param-name">--memory <span class="arg">&#123;auto|16|24|32|64|...&#125;</span></span>
+              <span class="badge badge-default">默认：auto</span>
+            </div>
+            <div class="param-desc">
+              <p>工作流可使用的最大内存（GB）。</p>
+              <p>设为 <code>auto</code> 时，OmniPrep 自动检测运行环境的可用内存，并将其中的 90% 分配给 Nextflow。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-nthreads">
+            <div class="param-head">
+              <span class="param-name">--nthreads <span class="arg">&lt;N&gt;</span></span>
+              <span class="badge badge-default">默认：8</span>
+            </div>
+            <div class="param-desc">
+              <p>多线程应用程序使用的线程数。设为 <code>0</code> 可取消显式的多线程控制。该值设置过高反而会降低效率，因此推荐 <code>8</code>。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-ignore_error">
+            <div class="param-head">
+              <span class="param-name">--ignore_error</span>
+              <span class="badge badge-flag">开关</span>
+            </div>
+            <div class="param-desc">
+              <p>遇到选定的非关键错误时继续运行工作流。适用于大规模数据集，但请谨慎使用——部分被试的衍生数据可能会缺失。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-resume">
+            <div class="param-head">
+              <span class="param-name">--resume</span>
+              <span class="badge badge-flag">开关</span>
+            </div>
+            <div class="param-desc">
+              <p>恢复上一次 Nextflow 运行。已完成的任务将从缓存中复用而不会重新计算。意外中断后使用此选项，可避免重跑已完成的任务。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-no_qc">
+            <div class="param-head">
+              <span class="param-name">--no_qc</span>
+              <span class="badge badge-flag">开关</span>
+            </div>
+            <div class="param-desc">
+              <p>禁用质量控制结果的生成，包括所有 QC 文档。</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="atlas-options">
+          <h2>图集与 ROI 级衍生选项</h2>
+
+          <div class="param" id="p-atlases">
+            <div class="param-head">
+              <span class="param-name">--atlases <span class="arg">"DK Glasser Schaefer200P7N Brainnetome"</span></span>
+              <span class="badge badge-type">字符串</span>
+            </div>
+            <div class="param-desc">
+              <p>指定用于图集级输出的脑图集。多个图集必须用双引号包裹并以空格分隔。</p>
+              <p><strong>内置图集：</strong></p>
+              <div class="pill-row">
+                <span class="pill hl">DK</span>
+                <span class="pill hl">DKT40</span>
+                <span class="pill hl">a2009s</span>
+                <span class="pill hl">Glasser</span>
+                <span class="pill hl">Schaefer100-1000</span>
+                <span class="pill hl">Brainnetome</span>
+              </div>
+              <p style="margin-top:12px"><strong>图集级输出可能包括：</strong></p>
+              <ul>
+                <li>T1w ROI 级形态学特征</li>
+                <li>BOLD ROI 时间序列</li>
+                <li>ROI Pearson 功能连接</li>
+                <li>DWI 结构连接组</li>
+              </ul>
+              <p>如使用自定义图集，需提供所需图集文件（如 GCS 或 ANNOT 文件、LUT 文件及重排 LUT 文件），并映射到 Docker 容器内的 <code>/opt/atlas</code> 路径。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-add_subcortical">
+            <div class="param-head">
+              <span class="param-name">--add_subcortical</span>
+              <span class="badge badge-flag">开关</span>
+            </div>
+            <div class="param-desc">
+              <p>在图集级输出中加入皮层下区域。</p>
+              <ul>
+                <li>对于仅覆盖皮层的图集，OmniPrep 可追加 21 个 FreeSurfer 定义的皮层下区域。详见源码中 <code>omniprep/atlas/LUT</code> 下的 LUT 文件。</li>
+                <li>对于自带皮层下分区的图集，需提供相应的 <code>.gca</code> 文件（命名为 <code>AtlasName.gca</code>）或 NIfTI 皮层下文件（命名为 <code>AtlasName_space-MNI152XXX-subcortex.nii.gz</code>，其中 <code>MNI152XXX</code> 为对应的 MNI 空间名），并映射到 Docker 容器内的 <code>/opt/atlas/</code> 路径。</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="param" id="p-subcortex_synthmorph_atlases">
+            <div class="param-head">
+              <span class="param-name">--subcortex_synthmorph_atlases <span class="arg">"Brainnetome"</span></span>
+              <span class="badge badge-type">字符串</span>
+            </div>
+            <div class="param-desc">
+              <p>指定皮层下分区以 NIfTI 图像形式提供、需要用 SynthMorph 进行变换的图集名称。当自定义图集包含皮层下 NIfTI 文件（如 <code>AtlasName_space-MNI152XXX-subcortex.nii.gz</code>）时使用此选项。该文件应映射到 Docker 容器内的 <code>/opt/atlas</code> 路径。</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="bold-options">
+          <h2>BOLD fMRI 选项</h2>
+
+          <h3 id="bold-basic">BOLD 基础</h3>
+
+          <div class="param" id="p-bold_task_type">
+            <div class="param-head">
+              <span class="param-name">--bold_task_type <span class="arg">"task1 task2 task3 ..."</span></span>
+              <span class="badge badge-type">字符串</span>
+            </div>
+            <div class="param-desc">
+              <p>指定要处理的 BOLD 任务名，如 <code>"rest"</code> 或具体任务名。多个任务应用双引号包裹并以空格分隔。</p>
+              <p>示例：<code>--bold_task_type "rest nback"</code></p>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_skip_frame">
+            <div class="param-head">
+              <span class="param-name">--bold_skip_frame <span class="arg">&lt;N&gt;</span></span>
+              <span class="badge badge-default">默认：0</span>
+            </div>
+            <div class="param-desc">
+              <p>去噪前剔除的 BOLD 初始时间点数。常用于去除受磁共振信号未达稳态影响的前几个非稳态 volume。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_sdc">
+            <div class="param-head">
+              <span class="param-name">--bold_sdc</span>
+              <span class="badge badge-flag">开关</span>
+            </div>
+            <div class="param-desc">
+              <p>当存在 fieldmap 或适用的畸变校正信息时，对 BOLD fMRI 施加磁化率畸变校正（SDC）。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_cifti">
+            <div class="param-head">
+              <span class="param-name">--bold_cifti</span>
+              <span class="badge badge-flag">开关</span>
+            </div>
+            <div class="param-desc">
+              <p>生成 CIFTI 格式的 BOLD 输出。默认 CIFTI 输出空间为 HCP 风格的 <code>91k</code> 灰质坐标（grayordinate）空间。未指定此选项时默认禁用。</p>
+            </div>
+          </div>
+
+          <h3 id="bold-spatial">空间与重采样</h3>
+
+          <div class="param" id="p-bold_surface_spaces">
+            <div class="param-head">
+              <span class="param-name">--bold_surface_spaces <span class="arg">&lt;SPACE&gt;</span></span>
+              <span class="badge badge-default">默认：fsaverage6</span>
+            </div>
+            <div class="param-desc">
+              <p>指定 BOLD 表面输出使用的表面模板空间。</p>
+              <p><strong>支持的取值：</strong></p>
+              <div class="pill-row">
+                <span class="pill hl">fsnative</span>
+                <span class="pill hl">fsaverage</span>
+                <span class="pill hl">fsaverage1</span>
+                <span class="pill hl">fsaverage2</span>
+                <span class="pill hl">fsaverage3</span>
+                <span class="pill hl">fsaverage4</span>
+                <span class="pill hl">fsaverage5</span>
+                <span class="pill hl">fsaverage6</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_output_space">
+            <div class="param-head">
+              <span class="param-name">--bold_output_space <span class="arg">&lt;SPACE:res-N&gt;</span></span>
+              <span class="badge badge-default">默认：MNI152NLin6Asym:res-2</span>
+            </div>
+            <div class="param-desc">
+              <p>指定 BOLD 体素输出的模板空间与分辨率，支持可选的 cohort 与分辨率设置。</p>
+              <p><strong>配准策略：</strong></p>
+              <ul>
+                <li><strong>成人：</strong>从 T1w 直接配准到指定输出空间。</li>
+                <li><strong>婴幼儿与儿童：</strong>根据 <code>age_months</code> 自动选择适龄的 MNIInfant 或 MNIPediatric cohort。
+                  <ul>
+                    <li>若所选 cohort 与输出空间一致，则从 T1w 直接配准到该空间（单阶段）。</li>
+                    <li>否则，先从 T1w 配准到适龄 cohort，再配准到指定输出空间（两阶段）。</li>
+                  </ul>
+                </li>
+              </ul>
+              <p>所有变换会被合并，使 BOLD 仅重采样一次。</p>
+              <p><strong>年龄检测（<code>age_months</code>）：</strong>自动从 BIDS 的 <code>sessions.tsv</code>（优先）或 <code>participants.tsv</code> 读取年龄。支持字段优先级：<code>age_days</code> &gt; <code>age_weeks</code> &gt; <code>age_months</code> &gt; <code>age</code>（岁）。所有年龄统一换算为月（<code>age_months</code>）。</p>
+              <p><strong>适龄模板：</strong></p>
+              <ul>
+                <li>5 岁以下 — <code>MNIInfant</code>（适龄 cohort）。</li>
+                <li>5 岁至 18 岁以下 — <code>MNIPediatricAsym</code>（适龄 cohort）。</li>
+                <li>18 岁及以上 — 成人模板。</li>
+              </ul>
+              <p><strong>示例：</strong></p>
+              <div class="pill-row">
+                <span class="pill hl">MNI152NLin6Asym:res-2</span>
+                <span class="pill hl">MNI152NLin2009cAsym:res-2</span>
+                <span class="pill hl">MNIInfant:cohort-4:res-2</span>
+                <span class="pill hl">MNIPediatricAsym:cohort-2:res-2</span>
+              </div>
+            </div>
+          </div>
+
+          <h3 id="bold-motion">头动与 Scrubbing</h3>
+
+          <div class="param" id="p-bold_confounds">
+            <div class="param-head">
+              <span class="param-name">--bold_confounds</span>
+              <span class="badge badge-flag">开关</span>
+            </div>
+            <div class="param-desc">
+              <p>计算 BOLD 混淆回归量，包括头动参数、组织信号、离群点回归量以及用于 BOLD 去噪的其他 nuisance 变量。</p>
+              <p>OmniPrep 生成用于头动帧检测的 <code>motion_outlier_XXX</code> 参数。默认采用 Power 方法检测头动帧，帧位移（FD）阈值为 0.2。</p>
+              <p>当启用 <code>--bold_denoise</code>、<code>--bold_roi_timeseries</code> 或 <code>--bold_roi_pearson_fc</code> 时，此选项自动启用。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_scrubbing">
+            <div class="param-head">
+              <span class="param-name">--bold_scrubbing</span>
+              <span class="badge badge-flag">开关</span>
+            </div>
+            <div class="param-desc">
+              <p>启用后处理工作流去噪步骤中的头动帧处理，具体策略由 <code>bold_scrubbing_strategy</code> 变量定义。头动帧标记由混淆文件中的 <code>motion_outlier_XXX</code> 与 <code>scrub_fd_XXX_0pX_mask</code> 值定义。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_scrubbing_strategy">
+            <div class="param-head">
+              <span class="param-name">--bold_scrubbing_strategy <span class="arg">&#123;regression|interpolation&#125;</span></span>
+              <span class="badge badge-default">默认：regression</span>
+            </div>
+            <div class="param-desc">
+              <p>指定 scrubbing 策略。目前支持 <code>regression</code> 与 <code>interpolation</code> 两种方法。</p>
+              <ul>
+                <li><code>regression</code> — 在协变量回归过程中将头动帧回归掉。</li>
+                <li><code>interpolation</code> — 使用 PCHIP 方法处理头动帧。</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_fd_type">
+            <div class="param-head">
+              <span class="param-name">--bold_fd_type <span class="arg">&#123;power|jenkinson&#125;</span></span>
+              <span class="badge badge-default">默认：power</span>
+            </div>
+            <div class="param-desc">
+              <p>指定用于检测头动帧的 FD 类型。目前支持 <code>power</code> 与 <code>jenkinson</code> 两种方法。</p>
+              <ul>
+                <li><code>power</code> — FD 值存储在混淆文件的 <code>framewise_displacement</code> 字段。</li>
+                <li><code>jenkinson</code> — 该值存储在混淆文件的 <code>rmsd</code> 字段。</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_fd_threshold">
+            <div class="param-head">
+              <span class="param-name">--bold_fd_threshold <span class="arg">&lt;N&gt;</span></span>
+              <span class="badge badge-default">默认：0.2</span>
+            </div>
+            <div class="param-desc">
+              <p>指定 FD 阈值。超过该阈值的时间帧将被视为头动帧。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_scrubbing_prev">
+            <div class="param-head">
+              <span class="param-name">--bold_scrubbing_prev <span class="arg">&lt;N&gt;</span></span>
+              <span class="badge badge-default">默认：0</span>
+            </div>
+            <div class="param-desc">
+              <p>每个检出的头动离群帧之前额外标记为离群点的 volume 数。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_scrubbing_later">
+            <div class="param-head">
+              <span class="param-name">--bold_scrubbing_later <span class="arg">&lt;N&gt;</span></span>
+              <span class="badge badge-default">默认：0</span>
+            </div>
+            <div class="param-desc">
+              <p>每个检出的头动离群帧之后同样标记为离群点的 BOLD volume 数。设为 <code>0</code> 表示不向后扩展。</p>
+            </div>
+          </div>
+
+          <h3 id="bold-denoise">去噪</h3>
+
+          <div class="param" id="p-bold_denoise">
+            <div class="param-head">
+              <span class="param-name">--bold_denoise</span>
+              <span class="badge badge-flag">开关</span>
+            </div>
+            <div class="param-desc">
+              <p>基于生成的混淆回归量对 BOLD 进行去噪。根据所选选项，可包括 nuisance 回归、去趋势、时间滤波以及初始时间点剔除（<code>--bold_skip_frame</code>）。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_denoise_strategy">
+            <div class="param-head">
+              <span class="param-name">--bold_denoise_strategy <span class="arg">&lt;STRATEGY&gt;</span></span>
+              <span class="badge badge-default">默认：motion24_wm_csf</span>
+            </div>
+            <div class="param-desc">
+              <p>指定 BOLD 去噪策略。</p>
+              <ul>
+                <li><code>motion6</code> — 六个刚体头动参数：<code>trans_x</code>、<code>trans_y</code>、<code>trans_z</code>、<code>rot_x</code>、<code>rot_y</code>、<code>rot_z</code>。</li>
+                <li><code>motion24</code> — Friston-24 头动模型：六个头动参数及其时间导数、平方项与平方导数。</li>
+                <li><code>motion24_wm_csf</code> — Friston-24 头动回归量，加上白质与脑脊液回归量（含导数与平方项）。</li>
+                <li><code>motion24_wm_csf_gsr</code> — Friston-24 头动回归量，加上白质、脑脊液与全信号回归量。包含全信号回归（GSR），使用时应有明确的方法学依据或敏感性分析支持。</li>
+                <li><code>acompcor6_motion24</code> — 前六个解剖学 CompCor 成分加上 Friston-24 头动回归量。</li>
+                <li><code>acompcor6_motion24_wm_csf</code> — 前六个解剖学 CompCor 成分加上 Friston-24 头动、白质与脑脊液回归量。</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_denoise_n_compcor">
+            <div class="param-head">
+              <span class="param-name">--bold_denoise_n_compcor <span class="arg">&lt;N&gt;</span></span>
+              <span class="badge badge-default">默认：6</span>
+            </div>
+            <div class="param-desc">
+              <p>选择基于 aCompCor 的去噪策略时使用的解剖学 CompCor 成分数。例如设为 <code>6</code> 时使用前六个 aCompCor 成分。此参数仅对包含 <code>acompcor</code> 的策略生效。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_filter_mode">
+            <div class="param-head">
+              <span class="param-name">--bold_filter_mode <span class="arg">&#123;bandpass|cosine|none&#125;</span></span>
+              <span class="badge badge-default">默认：bandpass</span>
+            </div>
+            <div class="param-desc">
+              <p>指定 BOLD 去噪时使用的时间滤波模式。</p>
+              <ul>
+                <li><code>bandpass</code> — 使用 <code>--bold_bandpass</code> 施加显式时间带通滤波，不使用 fMRIPrep 风格的 cosine 回归量。</li>
+                <li><code>cosine</code> — 使用 fMRIPrep 风格的 cosine 回归量去除高频漂移，禁用显式高通/低通滤波。</li>
+                <li><code>none</code> — 不使用 cosine 回归量，也不施加显式时间滤波。</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_bandpass">
+            <div class="param-head">
+              <span class="param-name">--bold_bandpass <span class="arg">"0.01-0.08"</span></span>
+              <span class="badge badge-default">默认："0.01-0.08"</span>
+            </div>
+            <div class="param-desc">
+              <p>时间带通频率范围（Hz）。仅在 <code>--bold_filter_mode</code> 设为 <code>"bandpass"</code> 时生效。</p>
+              <p>示例：<code>--bold_bandpass 0.01-0.08</code> 表示高通 0.01 Hz、低通 0.08 Hz。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_smooth_fwhm">
+            <div class="param-head">
+              <span class="param-name">--bold_smooth_fwhm <span class="arg">"0"</span></span>
+              <span class="badge badge-default">默认："0"</span>
+            </div>
+            <div class="param-desc">
+              <p>空间平滑核大小（毫米），以半高全宽（FWHM）表示。设为 <code>"0"</code> 可禁用平滑。可提供多个值，从同一去噪后 BOLD 图像生成多个不同平滑程度的输出。</p>
+              <p><strong>示例：</strong><code>--bold_smooth_fwhm "0"</code>、<code>--bold_smooth_fwhm "4"</code>、<code>--bold_smooth_fwhm "4 6 8"</code></p>
+            </div>
+          </div>
+
+          <h3 id="bold-metrics">指标与 ROI</h3>
+
+          <div class="param" id="p-bold_metrics">
+            <div class="param-head">
+              <span class="param-name">--bold_metrics <span class="arg">"reho alff malff zalff falff int"</span></span>
+              <span class="badge badge-type">字符串</span>
+            </div>
+            <div class="param-desc">
+              <p>指定要计算的一个或多个 BOLD 指标。多个指标应以空格分隔的字符串提供。</p>
+              <ul>
+                <li><code>reho</code> — 局部一致性（ReHo），使用 Kendall's W 度量相邻体素时间序列的局部同步性。</li>
+                <li><code>alff</code> — 配置频段内的低频振幅（ALFF）。</li>
+                <li><code>malff</code> — 均值归一化 ALFF，由体素级 ALFF 除以分析掩膜内的平均 ALFF 得到。</li>
+                <li><code>zalff</code> — Z 分数标准化 ALFF，对分析掩膜内的体素级 ALFF 值做标准化。</li>
+                <li><code>falff</code> — 分数低频振幅（fALFF），为低频振幅与全频段振幅之比。</li>
+                <li><code>int</code> — 固有神经时间尺度，由 BOLD 信号的时间自相关估计。</li>
+              </ul>
+              <p><strong>注意：</strong>ReHo 使用剔除头动帧后的时间序列计算；而 ALFF 系列指标（及其衍生指标）与 INT 使用完整序列（不剔除头动帧）计算。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_alff_bandpass">
+            <div class="param-head">
+              <span class="param-name">--bold_alff_bandpass <span class="arg">"0.01-0.08"</span></span>
+              <span class="badge badge-default">默认："0.01-0.08"</span>
+            </div>
+            <div class="param-desc">
+              <p>指定 ALFF/fALFF 频域计算时提取低频振幅的频率范围。</p>
+              <p>注意这与 <code>--bold_bandpass</code> 不同——后者用于 BOLD 信号的时域带通滤波；<code>--bold_alff_bandpass</code> 仅用于 ALFF/fALFF 频谱计算。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_roi_metrics">
+            <div class="param-head">
+              <span class="param-name">--bold_roi_metrics</span>
+              <span class="badge badge-flag">开关</span>
+            </div>
+            <div class="param-desc">
+              <p>启用基于图集的 BOLD 指标 ROI 汇总。对每个配置的脑图集，在各 ROI 内聚合体素级指标值，并保存为区域级的表格输出。未启用此选项时仅生成体素级指标图。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_roi_timeseries">
+            <div class="param-head">
+              <span class="param-name">--bold_roi_timeseries</span>
+              <span class="badge badge-flag">开关</span>
+            </div>
+            <div class="param-desc">
+              <p>从去噪后的 BOLD 图像中提取基于图集的 ROI 时间序列。需要 <code>--atlas</code>；启用 <code>--bold_roi_pearson_fc</code> 时自动启用。</p>
+              <p>输出保存为 N × T 矩阵（行 = ROI，列 = 时间点）。保存的 ROI 时间序列文件不含表头、索引或 ROI 标签列。</p>
+              <p><strong>注意：</strong>虽然时间序列保留完整时间轴，但 z 分数标准化时，各 ROI 的均值与标准差仅使用未被判定为头动伪影的有效帧计算。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_roi_pearson_fc">
+            <div class="param-head">
+              <span class="param-name">--bold_roi_pearson_fc</span>
+              <span class="badge badge-flag">开关</span>
+            </div>
+            <div class="param-desc">
+              <p>在排除被标记为异常头动的时间点后，计算两个有效 ROI 时间序列之间的 Pearson 相关系数，构建静态功能连接矩阵。</p>
+              <p>此选项自动启用 <code>--bold_roi_timeseries</code>、<code>--bold_denoise</code> 与 <code>--bold_confounds</code>。</p>
+              <p>输出为 N × N 的 ROI 功能连接矩阵，不含表头或 ROI 标签。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_roi_fc_censoring">
+            <div class="param-head">
+              <span class="param-name">--bold_roi_fc_censoring</span>
+              <span class="badge badge-flag">开关</span>
+            </div>
+            <div class="param-desc">
+              <p>控制计算静态功能连接时是否物理剔除（censor）头动帧。若省略，则在完整时间序列上计算相关矩阵，头动帧按指定的 <code>--bold_scrubbing_strategy</code> 处理。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-bold_roi_fc_fisherz">
+            <div class="param-head">
+              <span class="param-name">--bold_roi_fc_fisherz</span>
+              <span class="badge badge-flag">开关</span>
+            </div>
+            <div class="param-desc">
+              <p>保存经 Fisher-z 变换的 Pearson FC 值，而非原始 Pearson 相关系数。推荐用于组级统计分析、边级统计检验、回归模型或组平均 FC 计算。若将 FC 矩阵直接用作图边权重（如机器学习或 GNN 模型），使用原始 Pearson 相关系数可能更合适。</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="dwi-options">
+          <h2>DWI 选项</h2>
+
+          <h3 id="dwi-basic">DWI 基础</h3>
+
+          <div class="param" id="p-dwi_task_type">
+            <div class="param-head">
+              <span class="param-name">--dwi_task_type <span class="arg">"task1 task2 task3 ..."</span></span>
+              <span class="badge badge-type">字符串</span>
+            </div>
+            <div class="param-desc">
+              <p>当存在多个 DWI 采集时，指定要处理的 DWI 任务或采集标签。多个值应用双引号包裹并以空格分隔。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-dwi_sdc_method">
+            <div class="param-head">
+              <span class="param-name">--dwi_sdc_method <span class="arg">&#123;auto|pepolar|fieldmap|synb0|none&#125;</span></span>
+              <span class="badge badge-default">默认：auto</span>
+            </div>
+            <div class="param-desc">
+              <p>指定 DWI 的磁化率畸变校正（SDC）方法。</p>
+              <ul>
+                <li><code>auto</code> — 根据 BIDS 元数据与被试年龄自动选择最佳可用方法。
+                  <ul>
+                    <li>成人：<code>pepolar</code> &gt; <code>fieldmap</code> &gt; <code>synb0</code> &gt; <code>none</code>。</li>
+                    <li>婴幼儿/儿童：<code>pepolar</code> &gt; <code>fieldmap</code> &gt; <code>none</code>。</li>
+                  </ul>
+                </li>
+                <li><code>pepolar</code> — 使用反向相位编码 b0 图像进行校正（FSL TOPUP）。</li>
+                <li><code>fieldmap</code> — 使用基于 GRE 的场图进行畸变校正。</li>
+                <li><code>synb0</code> — 使用 Synb0-DISCO 合成无畸变 b0 图像进行校正。仅支持成人。</li>
+                <li><code>none</code> — 禁用磁化率畸变校正。</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="param" id="p-dwi_volume_res">
+            <div class="param-head">
+              <span class="param-name">--dwi_volume_res <span class="arg">&#123;native|02|03|...&#125;</span></span>
+              <span class="badge badge-default">默认：02</span>
+            </div>
+            <div class="param-desc">
+              <p>指定 DWI 体素输出分辨率。</p>
+              <ul>
+                <li><code>native</code> — 保留 DWI 原生分辨率。</li>
+                <li><code>01, 02, 03, ...</code> — 将 DWI 衍生数据重采样到指定的各向同性分辨率（毫米）。</li>
+              </ul>
+            </div>
+          </div>
+
+          <h3 id="dwi-tensor">DTI 与 CSD</h3>
+
+          <div class="param" id="p-dwi_cal_dti">
+            <div class="param-head">
+              <span class="param-name">--dwi_cal_dti</span>
+              <span class="badge badge-flag">开关</span>
+            </div>
+            <div class="param-desc">
+              <p>计算弥散张量成像（DTI）指标。</p>
+              <p>当通过 <code>--fiber_track_algorithm "tensor_prob"</code> 请求基于张量的纤维追踪，或通过 <code>--dwi_fa_connectome</code> 请求 FA 加权连接组时自动启用。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-dwi_dti_metrics">
+            <div class="param-head">
+              <span class="param-name">--dwi_dti_metrics <span class="arg">"fa md ad rd cl cp cs"</span></span>
+              <span class="badge badge-type">字符串</span>
+            </div>
+            <div class="param-desc">
+              <p>指定要计算的 DTI 指标。此参数仅控制生成哪些 DTI 指标——只有当 <code>--dwi_cal_dti</code> 启用（或被依赖选项自动启用）时才会计算 DTI 指标。</p>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>指标</th><th>说明</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>fa</code></td><td>各向异性分数（fractional anisotropy）</td></tr>
+                    <tr><td><code>md</code></td><td>平均弥散系数（mean diffusivity）</td></tr>
+                    <tr><td><code>ad</code></td><td>轴向弥散系数（axial diffusivity）</td></tr>
+                    <tr><td><code>rd</code></td><td>径向弥散系数（radial diffusivity）</td></tr>
+                    <tr><td><code>cl</code></td><td>线性各向异性（linear anisotropy）</td></tr>
+                    <tr><td><code>cp</code></td><td>扁平各向异性（planar anisotropy）</td></tr>
+                    <tr><td><code>cs</code></td><td>球形各向异性（spherical anisotropy）</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="param" id="p-dwi_cal_csd">
+            <div class="param-head">
+              <span class="param-name">--dwi_cal_csd</span>
+              <span class="badge badge-flag">开关</span>
+            </div>
+            <div class="param-desc">
+              <p>使用约束球面反卷积（CSD）估计纤维方向分布（FOD）。</p>
+              <p>选择基于 FOD 的追踪算法（<code>ifod2</code>、<code>sd_stream</code>）时自动启用。因此，只要指定了 <code>--fiber_track_algorithm "ifod2"</code>、<code>"sd_stream"</code> 或 <code>"ifod2 sd_stream"</code> 之一，而未显式指定 <code>--dwi_cal_csd</code>，OmniPrep 会自动启用 CSD 计算。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-dwi_csd_metrics">
+            <div class="param-head">
+              <span class="param-name">--dwi_csd_metrics <span class="arg">"wmfod"</span></span>
+              <span class="badge badge-type">字符串</span>
+            </div>
+            <div class="param-desc">
+              <p>指定启用 CSD 计算时生成的相关输出。典型输出包括白质纤维方向分布及相关的组织响应成分，具体取决于当前实现。</p>
+            </div>
+          </div>
+
+          <h3 id="dwi-track">纤维追踪</h3>
+
+          <div class="param" id="p-dwi_fiber_track">
+            <div class="param-head">
+              <span class="param-name">--dwi_fiber_track</span>
+              <span class="badge badge-flag">开关</span>
+            </div>
+            <div class="param-desc">
+              <p>执行全脑纤维追踪。启用 <code>--dwi_create_connectome</code>、<code>--dwi_fa_connectome</code> 或 <code>--fiber_track_sift2</code> 任一项时自动启用。若启用追踪但未指定算法，OmniPrep 默认使用 <code>ifod2</code>。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-fiber_track_algorithm">
+            <div class="param-head">
+              <span class="param-name">--fiber_track_algorithm <span class="arg">"ifod2"</span></span>
+              <span class="badge badge-default">默认："ifod2"</span>
+            </div>
+            <div class="param-desc">
+              <p>指定纤维追踪算法。可用双引号包裹并以空格分隔，同时指定多个追踪算法。</p>
+              <ul>
+                <li><code>ifod2</code> — 基于纤维方向分布的二阶积分（iFOD2）概率性追踪。需要 CSD。</li>
+                <li><code>sd_stream</code> — 基于球面反卷积的确定性 FOD 流线追踪。需要 CSD。</li>
+                <li><code>tensor_prob</code> — 基于张量的概率性追踪。需要 DTI。</li>
+              </ul>
+              <p><strong>示例：</strong><code>--fiber_track_algorithm "ifod2"</code>、<code>"ifod2 sd_stream"</code>、<code>"ifod2 sd_stream tensor_prob"</code></p>
+            </div>
+          </div>
+
+          <div class="param" id="p-fiber_track_select">
+            <div class="param-head">
+              <span class="param-name">--fiber_track_select <span class="arg">&lt;N&gt;</span></span>
+              <span class="badge badge-default">默认：10000000</span>
+            </div>
+            <div class="param-desc">
+              <p>纤维追踪时生成或筛选的流线数量。</p>
+              <p>纤维追踪目前基于 CPU，可能是 OmniPrep 中最耗时的步骤之一。</p>
+              <ul>
+                <li><strong>常规处理：</strong>500 万条流线在计算成本与追踪质量之间取得较好平衡。</li>
+                <li><strong>更高质量连接组：</strong>计算时间充足时可使用 1000 万条流线。</li>
+                <li><strong>测试/调试：</strong>可降低该值，如 <code>--fiber_track_select 200000</code>。</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="param" id="p-fiber_track_minlength">
+            <div class="param-head">
+              <span class="param-name">--fiber_track_minlength <span class="arg">&lt;N&gt;</span></span>
+              <span class="badge badge-default">默认：5</span>
+            </div>
+            <div class="param-desc">
+              <p>流线最小长度（毫米）。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-fiber_track_maxlength">
+            <div class="param-head">
+              <span class="param-name">--fiber_track_maxlength <span class="arg">&lt;N&gt;</span></span>
+              <span class="badge badge-default">默认：250</span>
+            </div>
+            <div class="param-desc">
+              <p>流线最大长度（毫米）。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-fiber_track_sift2">
+            <div class="param-head">
+              <span class="param-name">--fiber_track_sift2</span>
+              <span class="badge badge-flag">开关</span>
+            </div>
+            <div class="param-desc">
+              <p>在纤维追踪后应用 SIFT2 估计流线权重。此选项自动启用 <code>--dwi_fiber_track</code>。注意：若 <code>--fiber_track_algorithm</code> 中不包含 <code>ifod2</code>，OmniPrep 当前会使用基于 iFOD2 的追踪来生成 SIFT2 加权衍生数据。</p>
+            </div>
+          </div>
+
+          <h3 id="dwi-connectome">连接组</h3>
+
+          <div class="param" id="p-dwi_create_connectome">
+            <div class="param-head">
+              <span class="param-name">--dwi_create_connectome</span>
+              <span class="badge badge-flag">开关</span>
+            </div>
+            <div class="param-desc">
+              <p>基于纤维追踪输出构建基于图集的结构连接矩阵。需要通过 <code>--atlases "DK Brainnetome Glasser ..."</code> 指定图集。</p>
+              <p>自动启用 <code>--dwi_fiber_track</code> 与 <code>--dwi_cal_csd</code>。注意：若 <code>--fiber_track_algorithm</code> 中不包含 <code>ifod2</code>，OmniPrep 当前会基于 iFOD2 追踪构建结构连接组。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-dwi_fa_connectome">
+            <div class="param-head">
+              <span class="param-name">--dwi_fa_connectome</span>
+              <span class="badge badge-flag">开关</span>
+            </div>
+            <div class="param-desc">
+              <p>计算 FA 加权的结构连接矩阵。自动启用 <code>--dwi_cal_dti</code>、<code>--dwi_create_connectome</code> 与 <code>--dwi_fiber_track</code>。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-tck2conn_scale_invnodevol">
+            <div class="param-head">
+              <span class="param-name">--tck2conn_scale_invnodevol</span>
+              <span class="badge badge-flag">开关</span>
+            </div>
+            <div class="param-desc">
+              <p>在结构连接组构建时施加节点体积倒数缩放。该选项根据相连节点的体积倒数缩放连接权重，可降低 ROI 大小对连接估计的影响。</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="examples">
+          <h2>示例</h2>
+
+          <h3>对所有被试运行多模态预处理</h3>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">bash</span><button class="copy-btn">复制</button></div>
+            <pre><code>omniprep-docker /data /out participant \
+  --fs_license_file /opt/freesurfer/license.txt \
+  --tasks "anat bold dwi" \
+  [options]</code></pre>
+          </div>
+
+          <h3>使用已有结构衍生数据，仅对选定被试运行 BOLD 预处理</h3>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">bash</span><button class="copy-btn">复制</button></div>
+            <pre><code>omniprep-docker /data /out participant \
+  --fs_license_file /opt/freesurfer/license.txt \
+  --tasks "bold" \
+  --subjects_dir /out/Recon \
+  --participant_label "sub-001 sub-002" \
+  [options]</code></pre>
+          </div>
+
+          <h3>完整 BOLD 衍生数据：去噪、指标与功能连接组</h3>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">bash</span><button class="copy-btn">复制</button></div>
+            <pre><code>omniprep-docker /data /out participant \
+  --fs_license_file /opt/freesurfer/license.txt \
+  --tasks "bold" \
+  --bold_task_type "rest" \
+  --bold_denoise \
+  --bold_denoise_strategy motion24_wm_csf \
+  --bold_filter_mode bandpass \
+  --bold_bandpass "0.01-0.08" \
+  --bold_metrics "reho alff falff" \
+  --atlases "DK Brainnetome" \
+  --bold_roi_pearson_fc \
+  --bold_roi_fc_fisherz</code></pre>
+          </div>
+
+          <h3>DWI：CSD 纤维追踪与结构连接组</h3>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">bash</span><button class="copy-btn">复制</button></div>
+            <pre><code>omniprep-docker /data /out participant \
+  --fs_license_file /opt/freesurfer/license.txt \
+  --tasks "dwi" \
+  --dwi_sdc_method auto \
+  --fiber_track_algorithm "ifod2" \
+  --fiber_track_select 10000000 \
+  --atlases "DK Brainnetome" \
+  --dwi_create_connectome \
+  --tck2conn_scale_invnodevol</code></pre>
+          </div>
+        </section>
+
+      </article>
+    </div>
+
+</Layout>

@@ -1,0 +1,53 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { releasesUrl, site } from '../config';
+const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
+---
+<Layout lang="en" title="Changelog — OmniPrep" description="OmniPrep release notes and version history." active="log">
+<section class="page-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href={`${baseUrl}/`}>Home</a><span class="sep">/</span>Changelog</div>
+    <h1>Changelog</h1>
+    <p class="lead">All notable changes to OmniPrep are documented here.</p>
+  </div>
+</section>
+
+<div class="container" style="max-width:900px;padding:48px 24px 80px">
+  <article class="doc-content prose">
+<h1>Changelog</h1>
+<p>All notable changes to OmniPrep are documented here. The format follows<br />
+<a href="https://keepachangelog.com/">Keep a Changelog</a>, and versions adhere to<br />
+<a href="https://semver.org/">Semantic Versioning</a>.</p>
+<div class="callout info">
+<svg class="ci" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+<p><strong>Versioned documentation</strong> Each release keeps its own copy of the documentation. Older versions remain 
+available via the version selector (top of the page) — they are never deleted. 
+The source code for every release is tagged in the 
+<a href={releasesUrl}>repository</a>.</p>
+</div>
+<h2>[26.10.0] — 2026-10-12</h2>
+<h3>Added</h3>
+<ul>
+<li>Initial public documentation site (MkDocs Material) with English and 简体中文 support.</li>
+<li>Light / dark theme toggle following the OmniPrep brand palette.</li>
+<li>Versioned documentation infrastructure (mike), so future <code>v27.x</code> releases coexist with <code>v26.x</code>.</li>
+</ul>
+<h3>Changed</h3>
+<ul>
+<li>Homepage tagline updated to: <em>A Unified Pipeline for Accelerating Large-Scale Multimodal MRI Research Across the Lifespan</em>.</li>
+</ul>
+<h2>[26.2.1] — unreleased</h2>
+<div class="callout note">
+<svg class="ci" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 16H3z"/><path d="M12 9v4M12 16h.01"/></svg>
+<p>Placeholder entry — replace with real release notes as the pipeline matures.</p>
+</div>
+<!-- Template for future releases:
+## [x.y.z] — YYYY-MM-DD
+### Added
+### Changed
+### Fixed
+### Removed
+-->
+  </article>
+</div>
+</Layout>

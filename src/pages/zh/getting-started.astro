@@ -1,0 +1,145 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { site } from '../../config';
+const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
+---
+<Layout lang="zh" title="快速开始 — OmniPrep" description="OmniPrep 统一多模态 MRI 预处理与分析流程。" active="start">
+<section class="page-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href={`${baseUrl}/zh/`}>首页</a><span class="sep">/</span>快速开始</div>
+    <h1>快速开始</h1>
+    <p class="lead">安装 OmniPrep、获取 FreeSurfer 许可证，并在几分钟内完成你的第一个 BIDS 数据集预处理。</p>
+  </div>
+</section>
+
+<section class="docs-layout container">
+      <aside class="toc">
+        <div class="toc-title">本页目录</div>
+        <ul>
+          <li><a class="level-1" href="#requirements">环境要求</a></li>
+          <li><a class="level-1" href="#installation">安装</a></li>
+          <li><a href="#docker">Docker</a></li>
+          <li><a href="#singularity">Singularity / Apptainer</a></li>
+          <li><a class="level-1" href="#license">FreeSurfer 许可证</a></li>
+          <li><a class="level-1" href="#quickstart">快速开始</a></li>
+          <li><a class="level-1" href="#examples">运行示例</a></li>
+          <li><a href="#ex-all">全部模态</a></li>
+          <li><a href="#ex-bold">仅 BOLD（复用 Recon）</a></li>
+          <li><a class="level-1" href="#output">输出结构</a></li>
+        </ul>
+      </aside>
+      <article class="doc-content prose">
+<h1>快速开始</h1>
+<p>安装 OmniPrep、获取 FreeSurfer 许可证，并在几分钟内完成你的第一个 BIDS 数据集预处理。</p>
+<h2 id="requirements">环境要求</h2>
+<p>OmniPrep 以自包含容器镜像发布，大部分依赖已内置。你需要准备：</p>
+<table>
+<thead>
+<tr>
+<th>要求</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Docker</strong>（或 Singularity / Apptainer）</td>
+<td>运行工作流的容器运行时。</td>
+</tr>
+<tr>
+<td><strong>FreeSurfer 许可证文件</strong></td>
+<td>结构重建必需。免费——<a href="https://surfer.nmr.mgh.harvard.edu/registration.html">在此注册</a>。</td>
+</tr>
+<tr>
+<td><strong>BIDS 格式数据集</strong></td>
+<td>按 <a href="https://bids.neuroimaging.io/">BIDS</a> 标准组织的数据。</td>
+</tr>
+<tr>
+<td><strong>GPU（可选）</strong></td>
+<td>加速可用步骤。可通过 <code>--device cpu</code> 回退到 CPU。</td>
+</tr>
+</tbody>
+</table>
+<div class="callout note">
+<svg class="ci" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 16H3z"/><path d="M12 9v4M12 16h.01"/></svg>
+<p><strong>存储提示</strong> 多模态预处理会产生大量中间文件。磁盘空间紧张时请使用 <code>--remove_temp_files</code>。</p>
+</div>
+<h2 id="installation">安装</h2>
+<p>拉取最新的 OmniPrep 镜像，无需编译。</p>
+<h3 id="docker">Docker</h3>
+<pre><code class="language-bash">docker pull uxhao/omniprep:latest
+</code></pre>
+<p>验证镜像并打印内置帮助：</p>
+<pre><code class="language-bash">docker run --rm uxhao/omniprep:latest --help
+</code></pre>
+<h3 id="singularity">Singularity / Apptainer</h3>
+<p>从 Docker 镜像构建 Singularity 镜像，或使用预构建的 <code>.simg</code>：</p>
+<pre><code class="language-bash">singularity pull omniprep.simg docker://uxhao/omniprep:latest
+</code></pre>
+<h2 id="license">FreeSurfer 许可证</h2>
+<p>OmniPrep 结构重建需要一个有效的 FreeSurfer 许可证文件（<code>license.txt</code>），<strong>免费</strong>获取：</p>
+<ol>
+<li><strong>注册</strong>——在 <a href="https://surfer.nmr.mgh.harvard.edu/registration.html">surfer.nmr.mgh.harvard.edu/registration.html</a> 填写表单。</li>
+<li><strong>下载 <code>license.txt</code></strong>——你会通过邮件收到，保存到已知路径。</li>
+<li><strong>挂载</strong>——通过 <code>--fs_license_file</code> 传入路径（见下文）。</li>
+</ol>
+<div class="callout warning">
+<svg class="ci" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 16H3z"/><path d="M12 9v4M12 16h.01"/></svg>
+<p><strong>请勿分发许可证</strong> 每位用户需自行获取许可证，OmniPrep 从不内置许可证。</p>
+</div>
+<h2 id="quickstart">快速开始</h2>
+<p>最小运行需要三个挂载：BIDS 数据、输出目录和 FreeSurfer 许可证。</p>
+<h4>Docker</h4>
+
+<pre><code class="language-bash">docker run -it --rm [--gpus all] \
+  -v /path/to/bids:/data \
+  -v /path/to/output:/out \
+  -v /path/to/fs_license.txt:/license.txt \
+  uxhao/omniprep:latest /data /out participant \
+  --fs_license_file /license.txt \
+  --tasks &quot;anat bold dwi&quot;
+</code></pre>
+<h4>Singularity / Apptainer</h4>
+
+<pre><code class="language-bash">singularity run [-nv] \
+  --bind /path/to/bids:/data \
+  --bind /path/to/output:/out \
+  --bind /path/to/fs_license.txt:/license.txt \
+  omniprep.simg \
+  --fs_license_file /license.txt \
+  --tasks &quot;anat bold dwi&quot;
+</code></pre>
+<div class="callout tip">
+<svg class="ci" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10c.6.6 1 1.2 1 2h6c0-.8.4-1.4 1-2a6 6 0 0 0-4-10z"/></svg>
+<p>不带参数运行会启动交互式 Streamlit Web 界面；带单个参数（<code>--help</code>）会打印完整参数参考。</p>
+</div>
+<h2 id="examples">运行示例</h2>
+<h3 id="ex-all">对所有被试执行多模态预处理</h3>
+<pre><code class="language-bash">omniprep-docker /data /out participant \
+  --fs_license_file /opt/freesurfer/license.txt \
+  --tasks &quot;anat bold dwi&quot; \
+  [options]
+</code></pre>
+<h3 id="ex-bold">仅做 BOLD，复用已有结构衍生数据</h3>
+<pre><code class="language-bash">omniprep-docker /data /out participant \
+  --fs_license_file /opt/freesurfer/license.txt \
+  --tasks &quot;bold&quot; \
+  --subjects_dir /out/Recon \
+  --participant_label &quot;sub-001 sub-002&quot; \
+  [options]
+</code></pre>
+<p>当 <code>--tasks</code> 省略 <code>anat</code> 时，BOLD 和 DWI 工作流仍需要结构衍生数据（T1w、掩膜、表面、分割、分区）。通过 <code>--subjects_dir</code> 提供；若未指定，默认使用 <code>output_dir/derivatives/omniprep/Recon</code>。</p>
+<h2 id="output">输出结构</h2>
+<p>所有衍生数据都写入 <code>output_dir/derivatives/omniprep</code>：</p>
+<pre><code class="language-text">output_dir/
+└── derivatives/
+    └── omniprep/
+        ├── Recon/        # FreeSurfer 结构衍生数据
+        ├── BOLD/         # 去噪 BOLD + 体素/ROI 指标
+        ├── DWI/          # DTI/CSD 指标、纤维追踪、连接组
+        ├── QC/           # 运行报告、trace、时间线
+        └── WorkDir/      # Nextflow 工作与运行时状态
+</code></pre>
+<p>完整参数参考请见<a href="/zh/documentation/">文档</a>页面。</p>
+      </article>
+    </section>
+</Layout>
