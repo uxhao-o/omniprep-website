@@ -15,3 +15,6 @@ pagefind.exe
 # local preview servers / playwright scratch
 .playwright-cli/
 .astro/
+
+# IDE config
+.idea/
