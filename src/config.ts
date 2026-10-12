@@ -11,9 +11,9 @@ export const site = {
   /** GitHub repository name. */
   githubRepo: 'omniprep-website',
   /** Canonical site domain (no trailing slash). */
-  url: 'https://uxhao-o.github.io',
+  url: 'https://omniprep.run',
   /** Deployment base path ('' for apex, '/omniprep-website' for a project repo). */
-  basePath: '/omniprep-website',
+  basePath: '',
   /** Current pipeline version (also drives versioned-docs release names). */
   version: '26.2.1',
 };
