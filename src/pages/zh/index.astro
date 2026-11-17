@@ -3,11 +3,11 @@ import Layout from '../../layouts/Layout.astro';
 import { site } from '../../config';
 const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
 ---
-<Layout lang="zh" title="OmniPrep — 一个用于加速全生命周期大规模多模态 MRI 研究的统一流程" description="OmniPrep 统一多模态 MRI 预处理与分析流程。" active="home">
+<Layout lang="zh" title="OmniPrep — 统一流程，加速大规模多模态 MRI 研究" description="OmniPrep 统一多模态 MRI 预处理与分析流程。" active="home">
 <section class="hero">
   <div class="container">
     <span class="hero-badge"><span class="dot"></span> 多模态 · 可扩展 · 可复现</span>
-    <h1>面向全生命周期的<br /><span class="grad">多模态 MRI 一体化处理流程</span></h1>
+    <h1><span class="grad">加速</span><span class="grad-2">大规模多模态 MRI 研究</span>的统一流程</h1>
     <p class="hero-sub">
         OmniPrep 集成 sMRI、fMRI 和 dMRI 的预处理与后续分析，涵盖基于脑图谱的 ROI 特征提取及脑连接组分析，并通过深度学习与并行计算加速处理。
     </p>
@@ -35,17 +35,95 @@ const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
 <section class="section">
   <div class="container">
     <div class="section-head">
-      <span class="eyebrow">为什么选择 OmniPrep</span>
-      <h2>OmniPrep 概览</h2>
-      <p class="lead">一条命令，从原始 BIDS 数据到分析就绪的衍生数据，覆盖每一个 MRI 模态。</p>
+      <span class="eyebrow">解决的实际问题</span>
+      <h2>OmniPrep 解决了什么</h2>
+      <p class="lead">大规模脑影像研究已同时采集结构、功能与弥散三类模态，如何又快又统一地把原始数据变成可分析的特征，已成为研究产出的第一道瓶颈。</p>
+    </div>
+    <div class="grid grid-2">
+      <div class="card problem-card">
+        <span class="tag">痛点一</span>
+        <h3>多模态流程割裂</h3>
+        <p>结构、功能、扩散预处理长期依赖 FreeSurfer、fMRIPrep、dMRIPrep 等独立工具，接口与输出标准各异，需手工编写脚本拼接，多模态结果难以横向比较。</p>
+        <div class="solve">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+          <span><strong>已解决</strong> — 三类模态在同一工作流内完成预处理与下游分析，模态间依赖自动调度，不再手工拼接。</span>
+        </div>
+      </div>
+      <div class="card problem-card">
+        <span class="tag">痛点二</span>
+        <h3>大规模处理太慢</h3>
+        <p>主流工具面向单机串行设计，缺少并行调度与深度学习加速手段；千被试级队列预处理动辄耗时以月计，中途失败重跑代价极高。</p>
+        <div class="solve">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+          <span><strong>已解决</strong> — 深度学习模型加速关键重建步骤，结合 Nextflow 任务级并行与自研 VELA-GPU 显存弹性调度，支持断点续算。</span>
+        </div>
+      </div>
+      <div class="card problem-card">
+        <span class="tag">痛点三</span>
+        <h3>全生命周期覆盖不足</h3>
+        <p>成人、幼儿与婴幼儿队列的模板与失真校正策略彼此割裂，跨年龄段研究需大量人工适配；质量控制多依赖人眼判读，缺乏流程内建的自动化 QC。</p>
+        <div class="solve">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+          <span><strong>已解决</strong> — 自动判龄并匹配对应 MNI 模板与失真校正策略，每次运行自动生成 QC 报告。</span>
+        </div>
+      </div>
+      <div class="card problem-card">
+        <span class="tag">痛点四</span>
+        <h3>止步于预处理且门槛高</h3>
+        <p>多数流水线止步于预处理，形态学、时间序列、连接组等特征仍需自行计算；且要求较强工程能力，缺少工科背景的临床医生难以独立完成全流程。</p>
+        <div class="solve">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+          <span><strong>已解决</strong> — 端到端直接产出分析就绪特征，使用者只面对一条容器命令，无需编程。</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section soft">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">六大创新点</span>
+      <h2>从数据到结论的完整链条</h2>
+      <p class="lead">统一 · 加速 · 全生命周期 · 端到端特征 · 可复现 · 零门槛</p>
     </div>
     <div class="grid grid-3">
-      <div class="card"><div class="card-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div><h3>统一多模态</h3><p>结构、功能与弥散 MRI 预处理集成于单一连贯的工作流，无需拼接多个工具。</p></div>
-      <div class="card"><div class="card-icon teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div><h3>基于 Nextflow</h3><p>可复现、容器化、可续跑。同一命令行即可从笔记本扩展到 HPC 集群与云端。</p></div>
-      <div class="card"><div class="card-icon orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div><h3>图集与 ROI 衍生特征</h3><p>内置皮层图集、皮层下分割、形态学特征、ROI 时间序列、功能与结构连接组。</p></div>
-      <div class="card"><div class="card-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><h3>内置质量控制</h3><p>每次运行自动生成 QC 报告、trace 和时间线——含头动 scrubbing 与 FD 帧检测。</p></div>
-      <div class="card"><div class="card-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><h3>年龄感知模板</h3><p>成人、儿童与婴儿队列，自动年龄检测并匹配 MNI 模板与畸变校正策略。</p></div>
-      <div class="card"><div class="card-icon teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4M4.2 4.2l2.8 2.8M17 17l2.8 2.8M4.2 19.8L7 17M17 7l2.8-2.8"/></svg></div><h3>GPU 加速</h3><p>自动调用可用 GPU，支持透明 CPU 回退与受监管的 GPU 守护进程。</p></div>
+      <div class="card innovation-card">
+        <span class="idx">01</span>
+        <span class="en">Unified</span>
+        <h3>统一多模态</h3>
+        <p>结构、功能、扩散三类模态在同一工作流内完成预处理与下游分析，模态间依赖自动调度，不再手工拼接多个独立工具。</p>
+      </div>
+      <div class="card innovation-card featured">
+        <span class="idx">02</span>
+        <span class="en">Accelerating</span>
+        <h3>深度学习与并行加速</h3>
+        <p>以深度学习模型加速关键重建步骤，结合 Nextflow 任务级并行与自研 VELA-GPU 显存弹性调度，让大规模队列处理不再以月计。</p>
+      </div>
+      <div class="card innovation-card">
+        <span class="idx">03</span>
+        <span class="en">Across the Lifespan</span>
+        <h3>全生命周期覆盖</h3>
+        <p>成人、幼儿、婴幼儿队列自动判龄，匹配对应 MNI 模板与失真校正策略，一套流程覆盖全年龄段数据。</p>
+      </div>
+      <div class="card innovation-card">
+        <span class="idx">04</span>
+        <span class="en">End-to-end</span>
+        <h3>端到端分析就绪特征</h3>
+        <p>不止于预处理：直接产出形态学、ROI 时间序列、FC、ReHo/ALFF、结构连接组与 CIFTI 等可进组级统计的特征。</p>
+      </div>
+      <div class="card innovation-card">
+        <span class="idx">05</span>
+        <span class="en">Reproducible</span>
+        <h3>内置质控与可复现</h3>
+        <p>自动化 QC 报告、头动清洗与 FD 帧检测随每次运行生成；容器版本锁定、<code style="font-family:var(--font-mono)">trace</code> 可追溯，结果可复现、可信。</p>
+      </div>
+      <div class="card innovation-card">
+        <span class="idx">06</span>
+        <span class="en">Zero-code</span>
+        <h3>零代码门槛</h3>
+        <p>工程复杂度封装在容器与工作流内部，使用者只面对一条命令，临床研究者无需编程即可独立完成。</p>
+      </div>
     </div>
   </div>
 </section>

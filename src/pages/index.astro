@@ -3,13 +3,13 @@ import Layout from '../layouts/Layout.astro';
 import { site } from '../config';
 const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
 ---
-<Layout lang="en" title="OmniPrep — A Unified Pipeline for Accelerating Large-Scale Multimodal MRI Research Across the Lifespan" description="OmniPrep — unified multimodal MRI preprocessing and analysis pipeline." active="home">
+<Layout lang="en" title="OmniPrep — A Unified Pipeline for Accelerating Large-Scale Multimodal MRI Research" description="OmniPrep — unified multimodal MRI preprocessing and analysis pipeline." active="home">
 
     <!-- HERO -->
     <section class="hero">
       <div class="container">
         <span class="hero-badge"><span class="dot"></span> Multi-modal · Scalable · Reproducible</span>
-        <h1><span class="grad">Unified Pipeline for Multimodal MRI Processing</span> Across the Lifespan</h1>
+        <h1>A Unified Pipeline for <span class="grad">Accelerating</span> <span class="grad grad-2">Large-Scale Multimodal MRI Research</span></h1>
         <p class="hero-sub">
             OmniPrep unifies sMRI, dMRI, and fMRI preprocessing and downstream analysis, from atlas-based ROI features to connectomics, accelerated by deep learning and parallel computing.
         </p>
@@ -40,56 +40,99 @@ const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
       </div>
     </section>
 
-    <!-- FEATURES -->
+    <!-- PROBLEMS -->
     <section class="section">
       <div class="container">
         <div class="section-head">
-          <span class="eyebrow">Why OmniPrep</span>
-          <h2>OmniPrep in a nutshell</h2>
-          <p class="lead">One command from raw BIDS data to analysis-ready derivatives, across every MRI modality.</p>
+          <span class="eyebrow">The real-world problem</span>
+          <h2>What OmniPrep solves</h2>
+          <p class="lead">Large-scale brain imaging now combines sMRI, fMRI and dMRI at cohort scale. Turning raw data into analyzable features has become the first bottleneck — for four concrete reasons.</p>
+        </div>
+        <div class="grid grid-2">
+          <div class="card problem-card">
+            <span class="tag">Problem 01</span>
+            <h3>Fragmented multimodal workflows</h3>
+            <p>Structural, functional and diffusion processing still rely on FreeSurfer, fMRIPrep and dMRIPrep as separate tools with incompatible interfaces and outputs. Gluing them together takes hand-written scripts, and results across modalities are hard to compare.</p>
+            <div class="solve">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+              <span><strong>Solved</strong> — all three modalities run in one workflow, with inter-modality dependencies scheduled automatically.</span>
+            </div>
+          </div>
+          <div class="card problem-card">
+            <span class="tag">Problem 02</span>
+            <h3>Too slow at cohort scale</h3>
+            <p>Mainstream pipelines are designed for serial execution on a single machine, without parallel scheduling or deep-learning acceleration. Preprocessing a thousand-subject cohort takes months, and a mid-run failure is costly to recover from.</p>
+            <div class="solve">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+              <span><strong>Solved</strong> — deep-learning models for key reconstruction steps, Nextflow task-level parallelism, and VELA-GPU elastic scheduling with checkpoint resume.</span>
+            </div>
+          </div>
+          <div class="card problem-card">
+            <span class="tag">Problem 03</span>
+            <h3>Incomplete lifespan coverage</h3>
+            <p>Templates and distortion-correction strategies are split between adult, pediatric and infant cohorts, so cross-age studies require heavy manual adaptation. Quality control still depends on visual inspection, with no QC built into the pipeline.</p>
+            <div class="solve">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+              <span><strong>Solved</strong> — automatic age detection with matching MNI templates and distortion strategies, plus automated QC reports on every run.</span>
+            </div>
+          </div>
+          <div class="card problem-card">
+            <span class="tag">Problem 04</span>
+            <h3>Stops at preprocessing, and hard to use</h3>
+            <p>Most pipelines stop at preprocessing: morphometric features, time series and connectomes still have to be computed separately. They also demand real engineering skill, so clinical researchers without a technical background cannot run the full chain.</p>
+            <div class="solve">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+              <span><strong>Solved</strong> — analysis-ready features are produced end to end, and the whole chain runs from a single container command with no coding.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- INNOVATIONS -->
+    <section class="section soft">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">Key innovations</span>
+          <h2>Six innovations, one continuous chain</h2>
+          <p class="lead">From raw data to conclusions: unified · accelerated · lifespan-wide · end-to-end · reproducible · zero-code.</p>
         </div>
         <div class="grid grid-3">
-          <div class="card">
-            <div class="card-icon blue">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-            </div>
-            <h3>Unified Multimodal</h3>
-            <p>Structural (sMRI), functional (fMRI), and diffusion (dMRI) preprocessing in a single, coherent workflow — no stitching tools together.</p>
+          <div class="card innovation-card">
+            <span class="idx">01</span>
+            <span class="en">Unified</span>
+            <h3>Unified multimodal workflow</h3>
+            <p>Structural, functional and diffusion modalities are preprocessed and analyzed within a single workflow, with inter-modality dependencies scheduled automatically — no stitching independent tools together.</p>
           </div>
-          <div class="card">
-            <div class="card-icon teal">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-            </div>
-            <h3>Built on Nextflow</h3>
-            <p>Reproducible, containerized, and resumable. Scale from a laptop to HPC clusters and cloud with the same command line.</p>
+          <div class="card innovation-card featured">
+            <span class="idx">02</span>
+            <span class="en">Accelerating</span>
+            <h3>Deep learning &amp; parallel acceleration</h3>
+            <p>Deep-learning models accelerate key reconstruction steps, combined with Nextflow task-level parallelism and our in-house VELA-GPU elastic memory scheduler — large cohorts no longer take months.</p>
           </div>
-          <div class="card">
-            <div class="card-icon orange">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-            </div>
-            <h3>Atlas &amp; ROI Derivatives</h3>
-            <p>Built-in cortical atlases, subcortical parcellation, morphometric features, ROI time series, functional and structural connectomes.</p>
+          <div class="card innovation-card">
+            <span class="idx">03</span>
+            <span class="en">Across the Lifespan</span>
+            <h3>Lifespan coverage</h3>
+            <p>Adult, pediatric and infant cohorts are age-detected automatically, then matched to the corresponding MNI templates and distortion-correction strategies — one pipeline for every age range.</p>
           </div>
-          <div class="card">
-            <div class="card-icon green">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            </div>
-            <h3>Quality Control Built-in</h3>
-            <p>Automated QC reports, trace, and timeline generated with every run — motion scrubbing, FD-based frame detection included.</p>
+          <div class="card innovation-card">
+            <span class="idx">04</span>
+            <span class="en">End-to-end</span>
+            <h3>Analysis-ready features</h3>
+            <p>More than preprocessing: morphometry, ROI time series, FC, ReHo/ALFF, structural connectomes and CIFTI outputs — features that feed directly into group-level statistics.</p>
           </div>
-          <div class="card">
-            <div class="card-icon blue">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v16M4 4h16M4 4l16 16"/><rect x="2" y="2" width="20" height="20" rx="2" opacity="0"/></svg>
-            </div>
-            <h3>Age-Aware Templates</h3>
-            <p>Adult, pediatric, and infant cohorts with automatic age detection and matching MNI templates and distortion-correction strategies.</p>
+          <div class="card innovation-card">
+            <span class="idx">05</span>
+            <span class="en">Reproducible</span>
+            <h3>Built-in QC &amp; reproducibility</h3>
+            <p>Automated QC reports, motion scrubbing and FD-based frame detection come with every run; locked container versions and traceable <code style="font-family:var(--font-mono)">trace</code> make results reproducible and trustworthy.</p>
           </div>
-          <div class="card">
-            <div class="card-icon teal">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4M4.2 4.2l2.8 2.8M17 17l2.8 2.8M4.2 19.8L7 17M17 7l2.8-2.8"/></svg>
-            </div>
-            <h3>GPU Accelerated</h3>
-            <p>Automatically leverages available GPUs for eligible steps, with transparent CPU fallback and a supervised GPU daemon.</p>
+          <div class="card innovation-card">
+            <span class="idx">06</span>
+            <span class="en">Zero-code</span>
+            <h3>Zero-code entry point</h3>
+            <p>Engineering complexity stays inside the container and workflow. Users face a single command, so clinical researchers can run the full chain independently without programming.</p>
           </div>
         </div>
       </div>

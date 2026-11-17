@@ -10,6 +10,8 @@ export const site = {
   githubUser: 'uxhao-o',
   /** GitHub repository name. */
   githubRepo: 'omniprep-website',
+  /** GitHub repository name. */
+  codeRepo: 'omniprep',
   /** Canonical site domain (no trailing slash). */
   url: 'https://omniprep.run',
   /** Deployment base path ('' for apex, '/omniprep-website' for a project repo). */
@@ -19,4 +21,6 @@ export const site = {
 };
 
 export const repoUrl = `https://github.com/${site.githubUser}/${site.githubRepo}`;
-export const releasesUrl = `${repoUrl}/releases`;
+export const codeRepoUrl = `https://github.com/${site.githubUser}/${site.codeRepo}`;
+export const issuesUrl = `https://github.com/${site.githubUser}/${site.codeRepo}/issues`;
+export const releasesUrl = `${codeRepoUrl}/releases`;

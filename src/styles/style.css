@@ -253,10 +253,19 @@ code, pre, kbd, samp { font-family: var(--font-mono); }
 .hero h1 {
   font-size: clamp(2.4rem, 5.4vw, 3.9rem);
   letter-spacing: -0.03em;
+  line-height: 1.12;
   margin-bottom: 18px;
+  color: var(--navy);
 }
 .hero h1 .grad {
-  background: linear-gradient(100deg, var(--blue) 10%, var(--teal) 55%, var(--cyan) 100%);
+  background: linear-gradient(100deg, var(--blue) 0%, var(--teal) 60%, var(--cyan) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.hero h1 .grad-2 {
+  background: linear-gradient(100deg, var(--cyan) 0%, var(--teal) 45%, var(--blue) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -406,6 +415,81 @@ code, pre, kbd, samp { font-family: var(--font-mono); }
 .card h3 { margin-bottom: 8px; font-size: 1.1rem; }
 .card p { color: var(--muted); font-size: .95rem; margin: 0; }
 
+/* ---------- Problem cards (pain points OmniPrep solves) ---------- */
+.problem-card { border-top: 3px solid var(--border-strong); }
+.problem-card .tag {
+  display: inline-block;
+  font-size: .74rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--red);
+  background: var(--red-soft);
+  border-radius: 999px;
+  padding: 3px 10px;
+  margin-bottom: 12px;
+}
+.problem-card h3 { margin-bottom: 8px; }
+.problem-card .solve {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border);
+  font-size: .9rem;
+  color: var(--text);
+}
+.problem-card .solve svg {
+  flex: 0 0 auto;
+  width: 16px; height: 16px;
+  margin-top: 3px;
+  color: var(--green);
+}
+.problem-card .solve strong { color: var(--green); }
+
+/* ---------- Numbered innovation cards ---------- */
+.innovation-card { position: relative; }
+.innovation-card .idx {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px; height: 30px;
+  border-radius: 9px;
+  background: var(--blue-soft);
+  color: var(--blue);
+  font-size: .82rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  margin-bottom: 12px;
+}
+.innovation-card .en {
+  display: block;
+  font-size: .78rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 4px;
+}
+.innovation-card p { margin-bottom: 0; }
+.innovation-card p .resolves {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: .84rem;
+  font-weight: 600;
+  color: var(--blue);
+  background: var(--blue-soft);
+  border-radius: 6px;
+  padding: 3px 9px;
+}
+.innovation-card.featured {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 1px var(--blue), var(--shadow-md);
+}
+.innovation-card.featured .idx { background: var(--navy); color: #fff; }
+:root[data-theme="dark"] .innovation-card.featured .idx { background: var(--blue-soft); color: var(--navy); }
+
 /* ---------- Modality blocks ---------- */
 .modality {
   display: grid;
@@ -489,13 +573,13 @@ code, pre, kbd, samp { font-family: var(--font-mono); }
   text-align: center;
 }
 .stat-num {
-  font-size: 2.4rem;
-  font-weight: 800;
+  font-size: 2.2rem;
+  font-weight: 600;
   letter-spacing: -0.02em;
   color: #fff;
   line-height: 1;
 }
-.stat-num .unit { font-size: 1.2rem; font-weight: 600; color: #9fdfe8; }
+.stat-num .unit { font-size: 1.15rem; font-weight: 500; color: #9fdfe8; }
 .stat-label { color: #bcd0ec; font-size: .92rem; margin-top: 8px; }
 
 /* ---------- Page hero (interior pages) ---------- */
@@ -968,6 +1052,11 @@ td code, th code {
   --cyan:        #4fc9d8;
   --cyan-soft:   #123742;
 
+  --red:         #f08a7d;
+  --red-soft:    #3a1c1a;
+  --green:       #6fd39a;
+  --green-soft:  #14301f;
+
   --shadow-sm:   0 1px 2px rgba(0,0,0,.4);
   --shadow-md:   0 4px 12px rgba(0,0,0,.45);
   --shadow-lg:   0 12px 32px rgba(0,0,0,.55);
@@ -1005,8 +1094,14 @@ td code, th code {
 :root[data-theme="dark"] h3, :root[data-theme="dark"] h4,
 :root[data-theme="dark"] h5 { color: var(--navy); }
 :root[data-theme="dark"] .hero h1 .grad {
-  background: linear-gradient(100deg, #9cc5f5 10%, #45c4d2 55%, #4fc9d8 100%);
+  background: linear-gradient(100deg, #9cc5f5 0%, #45c4d2 60%, #4fc9d8 100%);
   -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+}
+:root[data-theme="dark"] .hero h1 .grad-2 {
+  background: linear-gradient(100deg, #4fc9d8 0%, #45c4d2 45%, #9cc5f5 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
 }
 :root[data-theme="dark"] .hero-sub, :root[data-theme="dark"] .section-head .lead { color: var(--muted); }
 :root[data-theme="dark"] .hero-badge { background: var(--blue-soft); color: var(--teal); border-color: var(--border); }

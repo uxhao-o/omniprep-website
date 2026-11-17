@@ -1,6 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { repoUrl, site } from '../../config';
+import {codeRepoUrl, repoUrl, site, issuesUrl} from '../../config';
 const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
 ---
 <Layout lang="zh" title="关于 — OmniPrep" description="OmniPrep 统一多模态 MRI 预处理与分析流程。" active="about">
@@ -8,7 +8,7 @@ const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
   <div class="container">
     <div class="breadcrumb"><a href={`${baseUrl}/zh/`}>首页</a><span class="sep">/</span>关于 OmniPrep</div>
     <h1>关于 OmniPrep</h1>
-    <p class="lead">一个用于加速全生命周期大规模多模态 MRI 研究的统一Pipeline</p>
+    <p class="lead">加速大规模多模态MRI研究的统一流程</p>
   </div>
 </section>
 
@@ -26,16 +26,26 @@ const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
         </ul>
       </aside>
       <article class="doc-content prose">
-<h1>关于 OmniPrep</h1>
-<div class="callout abstract">
-<svg class="ci" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>
-<p><strong>标语</strong> A Unified Pipeline for Accelerating Large-Scale Multimodal MRI Research Across the Lifespan.</p>
-</div>
-<h2 id="overview">概览</h2>
-<p>OmniPrep 是一个统一的神经影像流程，在单一连贯的工作流中标准化并预处理<br />
-<strong>结构（sMRI）</strong>、<strong>功能（fMRI）</strong>和<strong>弥散（dMRI）</strong> MRI 数据。它基于<br />
-<a href="https://www.nextflow.io/">Nextflow</a> 构建，容器化、可续跑，能够从单机扩展到大型 HPC 集群与云端。</p>
-<p>除预处理外，OmniPrep 还生成分析就绪的衍生数据：图集级与 ROI 级形态学特征、体素级与 ROI 级功能指标（ReHo、ALFF/fALFF、INT、时间序列、功能连接），以及弥散衍生的纤维追踪与结构连接组——均内置质量控制。</p>
+<!--<h1>关于 OmniPrep</h1>-->
+<!--<div class="callout abstract">-->
+<!--<svg class="ci" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>-->
+<!--<p><strong>标语</strong> A Unified Pipeline for Accelerating Large-Scale Multimodal MRI Research.</p>-->
+<!--</div>-->
+
+
+          <section id="overview">
+              <h2>Overview</h2>
+              <img src={`${baseUrl}/assets/img/logo-full.svg`} alt="OmniPrep logo" style="max-width:340px;margin:0 auto 28px;display:block" />
+              <p>
+                  OmniPrep 是一个统一的神经影像流程，在单一连续的工作流中标准化并预处理<strong>结构（sMRI）</strong>、<strong>功能（fMRI）</strong>和<strong>弥散（dMRI）</strong> MRI 数据。
+                  它基于<a href="https://www.nextflow.io/">Nextflow</a> 构建，容器化、可续跑，能够从单机扩展到云服务器与大型 HPC 集群。
+              </p>
+              <p>
+                  除预处理外，OmniPrep 还生成分析就绪的衍生数据：图集级与 ROI 级形态学特征、体素级与 ROI 级功能指标（ReHo、ALFF/fALFF、INT、时间序列、功能连接），
+                  以及弥散衍生的纤维追踪与结构连接组——均内置质量控制。
+              </p>
+          </section>
+
 <h2 id="principles">设计原则</h2>
 <div class="grid grid-2">
             <div class="card">
@@ -108,7 +118,7 @@ const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
   title   = &#123;OmniPrep: A Unified Pipeline for Accelerating Large-Scale Multimodal MRI Research Across the Lifespan&#125;,
   author  = &#123;OmniPrep Contributors&#125;,
   year    = &#123;2026&#125;,
-  url     = &#123;${repoUrl}&#125;
+  url     = &#123;{codeRepoUrl}&#125;
 &#125;
 </code></pre>
 <h2 id="acknowledgements">致谢</h2>
@@ -124,7 +134,7 @@ const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
 <h2 id="contributing">贡献</h2>
 <p>OmniPrep 以开放方式开发。欢迎贡献——bug 报告、功能请求、文档改进与 pull request。请遵循项目的贡献指南。</p>
 <h2 id="contact">联系</h2>
-<p>如有问题、反馈或合作意向，请在仓库提 issue 或联系维护者。</p>
+          <p>如有问题、反馈或合作意向，请在仓库提 <a href={issuesUrl} target="_blank" rel="noopener">issue</a> 或联系维护者。</p>
       </article>
     </section>
 </Layout>

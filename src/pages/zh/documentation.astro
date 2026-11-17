@@ -46,7 +46,7 @@ const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
             <pre><code>omniprep-docker       [bids_dir] [output_dir] [&#123;participant&#125;] [options]
 omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options]</code></pre>
           </div>
-          <p>选项以 <code>--flag</code> 或 <code>--flag value</code> 形式传入。布尔选项（如 <code>--resume</code>、<code>--bold_denoise</code>）出现即启用；含空格的值（任务列表、图集列表、指标列表）必须用双引号包裹。</p>
+          <p>选项以 <code>--flag</code> 或 <code>--flag value</code> 形式传入。布尔选项（如 <code>--resume</code>、<code>--bold-denoise</code>）出现即启用；多值选项（任务列表、图集列表、指标列表）以空格分隔传入，例如 <code>--tasks anat bold dwi</code>。</p>
           <div class="callout note">
             <svg class="ci" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
             <p><strong>交互模式：</strong>不带任何参数运行时会启动 Streamlit 网页界面；恰好带一个参数运行时，会打印完整的帮助文本。</p>
@@ -57,7 +57,7 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
           <h2>必需选项</h2>
           <div class="param" id="p-fs_license_file">
             <div class="param-head">
-              <span class="param-name">--fs_license_file <span class="arg">&lt;PATH&gt;</span></span>
+              <span class="param-name">--fs-license-file <span class="arg">&lt;PATH&gt;</span></span>
               <span class="badge badge-required">必需</span>
               <span class="badge badge-type">字符串</span>
             </div>
@@ -70,13 +70,23 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
         <section id="general-options">
           <h2>通用选项</h2>
 
-          <div class="param" id="p-tasks">
+          <div class="param" id="p-work_dir">
             <div class="param-head">
-              <span class="param-name">--tasks <span class="arg">"anat bold dwi"</span></span>
-              <span class="badge badge-default">默认："anat bold dwi"</span>
+              <span class="param-name">--work-dir <span class="arg">&lt;PATH&gt;</span></span>
+              <span class="badge badge-default">默认：output_dir/WorkDir</span>
             </div>
             <div class="param-desc">
-              <p>指定要运行的预处理工作流。多个任务必须用双引号包裹并以空格分隔。</p>
+              <p>指定 OmniPrep 中间结果的存储路径。若未指定，默认在输出路径下生成 <code>WorkDir</code> 目录。</p>
+            </div>
+          </div>
+
+          <div class="param" id="p-tasks">
+            <div class="param-head">
+              <span class="param-name">--tasks <span class="arg">anat bold dwi</span></span>
+              <span class="badge badge-default">默认：anat bold dwi</span>
+            </div>
+            <div class="param-desc">
+              <p>指定要运行的预处理工作流。多个任务以空格分隔传入即可。</p>
               <ul>
                 <li><code>anat</code> — T1w 结构像 MRI 预处理</li>
                 <li><code>bold</code> — BOLD 功能像 fMRI 预处理</li>
@@ -87,7 +97,7 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-age_group">
             <div class="param-head">
-              <span class="param-name">--age_group <span class="arg">&#123;adult|pediatric|infant&#125;</span></span>
+              <span class="param-name">--age-group <span class="arg">&#123;adult|pediatric|infant&#125;</span></span>
               <span class="badge badge-default">默认：adult</span>
             </div>
             <div class="param-desc">
@@ -102,7 +112,7 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-participant_label">
             <div class="param-head">
-              <span class="param-name">--participant_label <span class="arg">"sub-001 sub-002 ..."</span></span>
+              <span class="param-name">--participant-label <span class="arg">sub-001 sub-002 ...</span></span>
               <span class="badge badge-type">字符串</span>
             </div>
             <div class="param-desc">
@@ -112,7 +122,7 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-exclude_participant_label">
             <div class="param-head">
-              <span class="param-name">--exclude_participant_label <span class="arg">"sub-003 sub-004 ..."</span></span>
+              <span class="param-name">--exclude-participant-label <span class="arg">sub-003 sub-004 ...</span></span>
               <span class="badge badge-type">字符串</span>
             </div>
             <div class="param-desc">
@@ -120,9 +130,19 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
             </div>
           </div>
 
+          <div class="param" id="p-session_label">
+            <div class="param-head">
+              <span class="param-name">--session-label <span class="arg">ses-pre ses-post ...</span></span>
+              <span class="badge badge-type">字符串</span>
+            </div>
+            <div class="param-desc">
+              <p>以空格分隔的会话标识符列表，或单个标识符。若未指定，将处理 BIDS 目录中的所有现有会话。</p>
+            </div>
+          </div>
+
           <div class="param" id="p-subjects_dir">
             <div class="param-head">
-              <span class="param-name">--subjects_dir <span class="arg">&lt;PATH&gt;</span></span>
+              <span class="param-name">--subjects-dir <span class="arg">&lt;PATH&gt;</span></span>
               <span class="badge badge-default">默认：output_dir/derivatives/omniprep/Recon</span>
             </div>
             <div class="param-desc">
@@ -133,7 +153,7 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-skip_bids_validation">
             <div class="param-head">
-              <span class="param-name">--skip_bids_validation</span>
+              <span class="param-name">--skip-bids-validation</span>
               <span class="badge badge-flag">开关</span>
             </div>
             <div class="param-desc">
@@ -143,7 +163,7 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-remove_temp_files">
             <div class="param-head">
-              <span class="param-name">--remove_temp_files</span>
+              <span class="param-name">--remove-temp-files</span>
               <span class="badge badge-flag">开关</span>
             </div>
             <div class="param-desc">
@@ -200,7 +220,7 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-ignore_error">
             <div class="param-head">
-              <span class="param-name">--ignore_error</span>
+              <span class="param-name">--ignore-error</span>
               <span class="badge badge-flag">开关</span>
             </div>
             <div class="param-desc">
@@ -220,7 +240,7 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-no_qc">
             <div class="param-head">
-              <span class="param-name">--no_qc</span>
+              <span class="param-name">--no-qc</span>
               <span class="badge badge-flag">开关</span>
             </div>
             <div class="param-desc">
@@ -234,11 +254,11 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-atlases">
             <div class="param-head">
-              <span class="param-name">--atlases <span class="arg">"DK Glasser Schaefer200P7N Brainnetome"</span></span>
+              <span class="param-name">--atlases <span class="arg">DK Glasser Schaefer200P7N Brainnetome</span></span>
               <span class="badge badge-type">字符串</span>
             </div>
             <div class="param-desc">
-              <p>指定用于图集级输出的脑图集。多个图集必须用双引号包裹并以空格分隔。</p>
+              <p>指定用于图集级输出的脑图集。多个图集以空格分隔传入即可。</p>
               <p><strong>内置图集：</strong></p>
               <div class="pill-row">
                 <span class="pill hl">DK</span>
@@ -261,7 +281,7 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-add_subcortical">
             <div class="param-head">
-              <span class="param-name">--add_subcortical</span>
+              <span class="param-name">--add-subcortical</span>
               <span class="badge badge-flag">开关</span>
             </div>
             <div class="param-desc">
@@ -275,7 +295,7 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-subcortex_synthmorph_atlases">
             <div class="param-head">
-              <span class="param-name">--subcortex_synthmorph_atlases <span class="arg">"Brainnetome"</span></span>
+              <span class="param-name">--subcortex-synthmorph-atlases <span class="arg">Brainnetome</span></span>
               <span class="badge badge-type">字符串</span>
             </div>
             <div class="param-desc">
@@ -291,18 +311,18 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-bold_task_type">
             <div class="param-head">
-              <span class="param-name">--bold_task_type <span class="arg">"task1 task2 task3 ..."</span></span>
+              <span class="param-name">--bold-task-type <span class="arg">task1 task2 task3 ...</span></span>
               <span class="badge badge-type">字符串</span>
             </div>
             <div class="param-desc">
-              <p>指定要处理的 BOLD 任务名，如 <code>"rest"</code> 或具体任务名。多个任务应用双引号包裹并以空格分隔。</p>
-              <p>示例：<code>--bold_task_type "rest nback"</code></p>
+              <p>指定要处理的 BOLD 任务名，如 <code>rest</code> 或具体任务名。多个任务以空格分隔传入即可。</p>
+              <p>示例：<code>--bold-task-type rest nback</code></p>
             </div>
           </div>
 
           <div class="param" id="p-bold_skip_frame">
             <div class="param-head">
-              <span class="param-name">--bold_skip_frame <span class="arg">&lt;N&gt;</span></span>
+              <span class="param-name">--bold-skip-frame <span class="arg">&lt;N&gt;</span></span>
               <span class="badge badge-default">默认：0</span>
             </div>
             <div class="param-desc">
@@ -312,7 +332,7 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-bold_sdc">
             <div class="param-head">
-              <span class="param-name">--bold_sdc</span>
+              <span class="param-name">--bold-sdc</span>
               <span class="badge badge-flag">开关</span>
             </div>
             <div class="param-desc">
@@ -322,7 +342,7 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-bold_cifti">
             <div class="param-head">
-              <span class="param-name">--bold_cifti</span>
+              <span class="param-name">--bold-cifti</span>
               <span class="badge badge-flag">开关</span>
             </div>
             <div class="param-desc">
@@ -334,7 +354,7 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-bold_surface_spaces">
             <div class="param-head">
-              <span class="param-name">--bold_surface_spaces <span class="arg">&lt;SPACE&gt;</span></span>
+              <span class="param-name">--bold-surface-spaces <span class="arg">&lt;SPACE&gt;</span></span>
               <span class="badge badge-default">默认：fsaverage6</span>
             </div>
             <div class="param-desc">
@@ -355,7 +375,7 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-bold_output_space">
             <div class="param-head">
-              <span class="param-name">--bold_output_space <span class="arg">&lt;SPACE:res-N&gt;</span></span>
+              <span class="param-name">--bold-output-space <span class="arg">&lt;SPACE:res-N&gt;</span></span>
               <span class="badge badge-default">默认：MNI152NLin6Asym:res-2</span>
             </div>
             <div class="param-desc">
@@ -392,19 +412,19 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-bold_confounds">
             <div class="param-head">
-              <span class="param-name">--bold_confounds</span>
+              <span class="param-name">--bold-confounds</span>
               <span class="badge badge-flag">开关</span>
             </div>
             <div class="param-desc">
               <p>计算 BOLD 混淆回归量，包括头动参数、组织信号、离群点回归量以及用于 BOLD 去噪的其他 nuisance 变量。</p>
               <p>OmniPrep 生成用于头动帧检测的 <code>motion_outlier_XXX</code> 参数。默认采用 Power 方法检测头动帧，帧位移（FD）阈值为 0.2。</p>
-              <p>当启用 <code>--bold_denoise</code>、<code>--bold_roi_timeseries</code> 或 <code>--bold_roi_pearson_fc</code> 时，此选项自动启用。</p>
+              <p>当启用 <code>--bold-denoise</code>、<code>--bold-roi-timeseries</code> 或 <code>--bold-roi-pearson-fc</code> 时，此选项自动启用。</p>
             </div>
           </div>
 
           <div class="param" id="p-bold_scrubbing">
             <div class="param-head">
-              <span class="param-name">--bold_scrubbing</span>
+              <span class="param-name">--bold-scrubbing</span>
               <span class="badge badge-flag">开关</span>
             </div>
             <div class="param-desc">
@@ -414,7 +434,7 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-bold_scrubbing_strategy">
             <div class="param-head">
-              <span class="param-name">--bold_scrubbing_strategy <span class="arg">&#123;regression|interpolation&#125;</span></span>
+              <span class="param-name">--bold-scrubbing-strategy <span class="arg">&#123;regression|interpolation&#125;</span></span>
               <span class="badge badge-default">默认：regression</span>
             </div>
             <div class="param-desc">
@@ -428,7 +448,7 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-bold_fd_type">
             <div class="param-head">
-              <span class="param-name">--bold_fd_type <span class="arg">&#123;power|jenkinson&#125;</span></span>
+              <span class="param-name">--bold-fd-type <span class="arg">&#123;power|jenkinson&#125;</span></span>
               <span class="badge badge-default">默认：power</span>
             </div>
             <div class="param-desc">
@@ -442,7 +462,7 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-bold_fd_threshold">
             <div class="param-head">
-              <span class="param-name">--bold_fd_threshold <span class="arg">&lt;N&gt;</span></span>
+              <span class="param-name">--bold-fd-threshold <span class="arg">&lt;N&gt;</span></span>
               <span class="badge badge-default">默认：0.2</span>
             </div>
             <div class="param-desc">
@@ -452,7 +472,7 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-bold_scrubbing_prev">
             <div class="param-head">
-              <span class="param-name">--bold_scrubbing_prev <span class="arg">&lt;N&gt;</span></span>
+              <span class="param-name">--bold-scrubbing-prev <span class="arg">&lt;N&gt;</span></span>
               <span class="badge badge-default">默认：0</span>
             </div>
             <div class="param-desc">
@@ -462,7 +482,7 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-bold_scrubbing_later">
             <div class="param-head">
-              <span class="param-name">--bold_scrubbing_later <span class="arg">&lt;N&gt;</span></span>
+              <span class="param-name">--bold-scrubbing-later <span class="arg">&lt;N&gt;</span></span>
               <span class="badge badge-default">默认：0</span>
             </div>
             <div class="param-desc">
@@ -474,17 +494,17 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-bold_denoise">
             <div class="param-head">
-              <span class="param-name">--bold_denoise</span>
+              <span class="param-name">--bold-denoise</span>
               <span class="badge badge-flag">开关</span>
             </div>
             <div class="param-desc">
-              <p>基于生成的混淆回归量对 BOLD 进行去噪。根据所选选项，可包括 nuisance 回归、去趋势、时间滤波以及初始时间点剔除（<code>--bold_skip_frame</code>）。</p>
+              <p>基于生成的混淆回归量对 BOLD 进行去噪。根据所选选项，可包括 nuisance 回归、去趋势、时间滤波以及初始时间点剔除（<code>--bold-skip-frame</code>）。</p>
             </div>
           </div>
 
           <div class="param" id="p-bold_denoise_strategy">
             <div class="param-head">
-              <span class="param-name">--bold_denoise_strategy <span class="arg">&lt;STRATEGY&gt;</span></span>
+              <span class="param-name">--bold-denoise-strategy <span class="arg">&lt;STRATEGY&gt;</span></span>
               <span class="badge badge-default">默认：motion24_wm_csf</span>
             </div>
             <div class="param-desc">
@@ -502,7 +522,7 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-bold_denoise_n_compcor">
             <div class="param-head">
-              <span class="param-name">--bold_denoise_n_compcor <span class="arg">&lt;N&gt;</span></span>
+              <span class="param-name">--bold-denoise-n-compcor <span class="arg">&lt;N&gt;</span></span>
               <span class="badge badge-default">默认：6</span>
             </div>
             <div class="param-desc">
@@ -512,13 +532,13 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-bold_filter_mode">
             <div class="param-head">
-              <span class="param-name">--bold_filter_mode <span class="arg">&#123;bandpass|cosine|none&#125;</span></span>
+              <span class="param-name">--bold-filter-mode <span class="arg">&#123;bandpass|cosine|none&#125;</span></span>
               <span class="badge badge-default">默认：bandpass</span>
             </div>
             <div class="param-desc">
               <p>指定 BOLD 去噪时使用的时间滤波模式。</p>
               <ul>
-                <li><code>bandpass</code> — 使用 <code>--bold_bandpass</code> 施加显式时间带通滤波，不使用 fMRIPrep 风格的 cosine 回归量。</li>
+                <li><code>bandpass</code> — 使用 <code>--bold-bandpass</code> 施加显式时间带通滤波，不使用 fMRIPrep 风格的 cosine 回归量。</li>
                 <li><code>cosine</code> — 使用 fMRIPrep 风格的 cosine 回归量去除高频漂移，禁用显式高通/低通滤波。</li>
                 <li><code>none</code> — 不使用 cosine 回归量，也不施加显式时间滤波。</li>
               </ul>
@@ -527,23 +547,23 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-bold_bandpass">
             <div class="param-head">
-              <span class="param-name">--bold_bandpass <span class="arg">"0.01-0.08"</span></span>
-              <span class="badge badge-default">默认："0.01-0.08"</span>
+              <span class="param-name">--bold-bandpass <span class="arg">0.01-0.08</span></span>
+              <span class="badge badge-default">默认：0.01-0.08</span>
             </div>
             <div class="param-desc">
-              <p>时间带通频率范围（Hz）。仅在 <code>--bold_filter_mode</code> 设为 <code>"bandpass"</code> 时生效。</p>
-              <p>示例：<code>--bold_bandpass 0.01-0.08</code> 表示高通 0.01 Hz、低通 0.08 Hz。</p>
+              <p>时间带通频率范围（Hz）。仅在 <code>--bold-filter-mode</code> 设为 <code>bandpass</code> 时生效。</p>
+              <p>示例：<code>--bold-bandpass 0.01-0.08</code> 表示高通 0.01 Hz、低通 0.08 Hz。</p>
             </div>
           </div>
 
           <div class="param" id="p-bold_smooth_fwhm">
             <div class="param-head">
-              <span class="param-name">--bold_smooth_fwhm <span class="arg">"0"</span></span>
-              <span class="badge badge-default">默认："0"</span>
+              <span class="param-name">--bold-smooth-fwhm <span class="arg">0</span></span>
+              <span class="badge badge-default">默认：0</span>
             </div>
             <div class="param-desc">
-              <p>空间平滑核大小（毫米），以半高全宽（FWHM）表示。设为 <code>"0"</code> 可禁用平滑。可提供多个值，从同一去噪后 BOLD 图像生成多个不同平滑程度的输出。</p>
-              <p><strong>示例：</strong><code>--bold_smooth_fwhm "0"</code>、<code>--bold_smooth_fwhm "4"</code>、<code>--bold_smooth_fwhm "4 6 8"</code></p>
+              <p>空间平滑核大小（毫米），以半高全宽（FWHM）表示。设为 <code>0</code> 可禁用平滑。可提供多个值，从同一去噪后 BOLD 图像生成多个不同平滑程度的输出。</p>
+              <p><strong>示例：</strong><code>--bold-smooth-fwhm 0</code>、<code>--bold-smooth-fwhm 4</code>、<code>--bold-smooth-fwhm 4 6 8</code></p>
             </div>
           </div>
 
@@ -551,7 +571,7 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-bold_metrics">
             <div class="param-head">
-              <span class="param-name">--bold_metrics <span class="arg">"reho alff malff zalff falff int"</span></span>
+              <span class="param-name">--bold-metrics <span class="arg">reho alff malff zalff falff int</span></span>
               <span class="badge badge-type">字符串</span>
             </div>
             <div class="param-desc">
@@ -570,18 +590,18 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-bold_alff_bandpass">
             <div class="param-head">
-              <span class="param-name">--bold_alff_bandpass <span class="arg">"0.01-0.08"</span></span>
-              <span class="badge badge-default">默认："0.01-0.08"</span>
+              <span class="param-name">--bold-alff-bandpass <span class="arg">0.01-0.08</span></span>
+              <span class="badge badge-default">默认：0.01-0.08</span>
             </div>
             <div class="param-desc">
               <p>指定 ALFF/fALFF 频域计算时提取低频振幅的频率范围。</p>
-              <p>注意这与 <code>--bold_bandpass</code> 不同——后者用于 BOLD 信号的时域带通滤波；<code>--bold_alff_bandpass</code> 仅用于 ALFF/fALFF 频谱计算。</p>
+              <p>注意这与 <code>--bold-bandpass</code> 不同——后者用于 BOLD 信号的时域带通滤波；<code>--bold-alff-bandpass</code> 仅用于 ALFF/fALFF 频谱计算。</p>
             </div>
           </div>
 
           <div class="param" id="p-bold_roi_metrics">
             <div class="param-head">
-              <span class="param-name">--bold_roi_metrics</span>
+              <span class="param-name">--bold-roi-metrics</span>
               <span class="badge badge-flag">开关</span>
             </div>
             <div class="param-desc">
@@ -591,11 +611,11 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-bold_roi_timeseries">
             <div class="param-head">
-              <span class="param-name">--bold_roi_timeseries</span>
+              <span class="param-name">--bold-roi-timeseries</span>
               <span class="badge badge-flag">开关</span>
             </div>
             <div class="param-desc">
-              <p>从去噪后的 BOLD 图像中提取基于图集的 ROI 时间序列。需要 <code>--atlas</code>；启用 <code>--bold_roi_pearson_fc</code> 时自动启用。</p>
+              <p>从去噪后的 BOLD 图像中提取基于图集的 ROI 时间序列。需要 <code>--atlas</code>；启用 <code>--bold-roi-pearson-fc</code> 时自动启用。</p>
               <p>输出保存为 N × T 矩阵（行 = ROI，列 = 时间点）。保存的 ROI 时间序列文件不含表头、索引或 ROI 标签列。</p>
               <p><strong>注意：</strong>虽然时间序列保留完整时间轴，但 z 分数标准化时，各 ROI 的均值与标准差仅使用未被判定为头动伪影的有效帧计算。</p>
             </div>
@@ -603,29 +623,29 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-bold_roi_pearson_fc">
             <div class="param-head">
-              <span class="param-name">--bold_roi_pearson_fc</span>
+              <span class="param-name">--bold-roi-pearson-fc</span>
               <span class="badge badge-flag">开关</span>
             </div>
             <div class="param-desc">
               <p>在排除被标记为异常头动的时间点后，计算两个有效 ROI 时间序列之间的 Pearson 相关系数，构建静态功能连接矩阵。</p>
-              <p>此选项自动启用 <code>--bold_roi_timeseries</code>、<code>--bold_denoise</code> 与 <code>--bold_confounds</code>。</p>
+              <p>此选项自动启用 <code>--bold-roi-timeseries</code>、<code>--bold-denoise</code> 与 <code>--bold-confounds</code>。</p>
               <p>输出为 N × N 的 ROI 功能连接矩阵，不含表头或 ROI 标签。</p>
             </div>
           </div>
 
           <div class="param" id="p-bold_roi_fc_censoring">
             <div class="param-head">
-              <span class="param-name">--bold_roi_fc_censoring</span>
+              <span class="param-name">--bold-roi-fc-censoring</span>
               <span class="badge badge-flag">开关</span>
             </div>
             <div class="param-desc">
-              <p>控制计算静态功能连接时是否物理剔除（censor）头动帧。若省略，则在完整时间序列上计算相关矩阵，头动帧按指定的 <code>--bold_scrubbing_strategy</code> 处理。</p>
+              <p>控制计算静态功能连接时是否物理剔除（censor）头动帧。若省略，则在完整时间序列上计算相关矩阵，头动帧按指定的 <code>--bold-scrubbing-strategy</code> 处理。</p>
             </div>
           </div>
 
           <div class="param" id="p-bold_roi_fc_fisherz">
             <div class="param-head">
-              <span class="param-name">--bold_roi_fc_fisherz</span>
+              <span class="param-name">--bold-roi-fc-fisherz</span>
               <span class="badge badge-flag">开关</span>
             </div>
             <div class="param-desc">
@@ -641,17 +661,17 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-dwi_task_type">
             <div class="param-head">
-              <span class="param-name">--dwi_task_type <span class="arg">"task1 task2 task3 ..."</span></span>
+              <span class="param-name">--dwi-task-type <span class="arg">task1 task2 task3 ...</span></span>
               <span class="badge badge-type">字符串</span>
             </div>
             <div class="param-desc">
-              <p>当存在多个 DWI 采集时，指定要处理的 DWI 任务或采集标签。多个值应用双引号包裹并以空格分隔。</p>
+              <p>当存在多个 DWI 采集时，指定要处理的 DWI 任务或采集标签。多个值以空格分隔传入即可。</p>
             </div>
           </div>
 
           <div class="param" id="p-dwi_sdc_method">
             <div class="param-head">
-              <span class="param-name">--dwi_sdc_method <span class="arg">&#123;auto|pepolar|fieldmap|synb0|none&#125;</span></span>
+              <span class="param-name">--dwi-sdc-method <span class="arg">&#123;auto|pepolar|fieldmap|synb0|none&#125;</span></span>
               <span class="badge badge-default">默认：auto</span>
             </div>
             <div class="param-desc">
@@ -673,7 +693,7 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-dwi_volume_res">
             <div class="param-head">
-              <span class="param-name">--dwi_volume_res <span class="arg">&#123;native|02|03|...&#125;</span></span>
+              <span class="param-name">--dwi-volume-res <span class="arg">&#123;native|02|03|...&#125;</span></span>
               <span class="badge badge-default">默认：02</span>
             </div>
             <div class="param-desc">
@@ -689,22 +709,22 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-dwi_cal_dti">
             <div class="param-head">
-              <span class="param-name">--dwi_cal_dti</span>
+              <span class="param-name">--dwi-cal-dti</span>
               <span class="badge badge-flag">开关</span>
             </div>
             <div class="param-desc">
               <p>计算弥散张量成像（DTI）指标。</p>
-              <p>当通过 <code>--fiber_track_algorithm "tensor_prob"</code> 请求基于张量的纤维追踪，或通过 <code>--dwi_fa_connectome</code> 请求 FA 加权连接组时自动启用。</p>
+              <p>当通过 <code>--fiber-track-algorithm tensor_prob</code> 请求基于张量的纤维追踪，或通过 <code>--dwi-fa-connectome</code> 请求 FA 加权连接组时自动启用。</p>
             </div>
           </div>
 
           <div class="param" id="p-dwi_dti_metrics">
             <div class="param-head">
-              <span class="param-name">--dwi_dti_metrics <span class="arg">"fa md ad rd cl cp cs"</span></span>
+              <span class="param-name">--dwi-dti-metrics <span class="arg">fa md ad rd cl cp cs</span></span>
               <span class="badge badge-type">字符串</span>
             </div>
             <div class="param-desc">
-              <p>指定要计算的 DTI 指标。此参数仅控制生成哪些 DTI 指标——只有当 <code>--dwi_cal_dti</code> 启用（或被依赖选项自动启用）时才会计算 DTI 指标。</p>
+              <p>指定要计算的 DTI 指标。此参数仅控制生成哪些 DTI 指标——只有当 <code>--dwi-cal-dti</code> 启用（或被依赖选项自动启用）时才会计算 DTI 指标。</p>
               <div class="table-wrap">
                 <table>
                   <thead><tr><th>指标</th><th>说明</th></tr></thead>
@@ -724,18 +744,18 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-dwi_cal_csd">
             <div class="param-head">
-              <span class="param-name">--dwi_cal_csd</span>
+              <span class="param-name">--dwi-cal-csd</span>
               <span class="badge badge-flag">开关</span>
             </div>
             <div class="param-desc">
               <p>使用约束球面反卷积（CSD）估计纤维方向分布（FOD）。</p>
-              <p>选择基于 FOD 的追踪算法（<code>ifod2</code>、<code>sd_stream</code>）时自动启用。因此，只要指定了 <code>--fiber_track_algorithm "ifod2"</code>、<code>"sd_stream"</code> 或 <code>"ifod2 sd_stream"</code> 之一，而未显式指定 <code>--dwi_cal_csd</code>，OmniPrep 会自动启用 CSD 计算。</p>
+              <p>选择基于 FOD 的追踪算法（<code>ifod2</code>、<code>sd_stream</code>）时自动启用。因此，只要指定了 <code>--fiber-track-algorithm ifod2</code>、<code>sd_stream</code> 或 <code>ifod2 sd_stream</code> 之一，而未显式指定 <code>--dwi-cal-csd</code>，OmniPrep 会自动启用 CSD 计算。</p>
             </div>
           </div>
 
           <div class="param" id="p-dwi_csd_metrics">
             <div class="param-head">
-              <span class="param-name">--dwi_csd_metrics <span class="arg">"wmfod"</span></span>
+              <span class="param-name">--dwi-csd-metrics <span class="arg">wmfod</span></span>
               <span class="badge badge-type">字符串</span>
             </div>
             <div class="param-desc">
@@ -747,33 +767,33 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-dwi_fiber_track">
             <div class="param-head">
-              <span class="param-name">--dwi_fiber_track</span>
+              <span class="param-name">--dwi-fiber-track</span>
               <span class="badge badge-flag">开关</span>
             </div>
             <div class="param-desc">
-              <p>执行全脑纤维追踪。启用 <code>--dwi_create_connectome</code>、<code>--dwi_fa_connectome</code> 或 <code>--fiber_track_sift2</code> 任一项时自动启用。若启用追踪但未指定算法，OmniPrep 默认使用 <code>ifod2</code>。</p>
+              <p>执行全脑纤维追踪。启用 <code>--dwi-create-connectome</code>、<code>--dwi-fa-connectome</code> 或 <code>--fiber-track-sift2</code> 任一项时自动启用。若启用追踪但未指定算法，OmniPrep 默认使用 <code>ifod2</code>。</p>
             </div>
           </div>
 
           <div class="param" id="p-fiber_track_algorithm">
             <div class="param-head">
-              <span class="param-name">--fiber_track_algorithm <span class="arg">"ifod2"</span></span>
-              <span class="badge badge-default">默认："ifod2"</span>
+              <span class="param-name">--fiber-track-algorithm <span class="arg">ifod2</span></span>
+              <span class="badge badge-default">默认：ifod2</span>
             </div>
             <div class="param-desc">
-              <p>指定纤维追踪算法。可用双引号包裹并以空格分隔，同时指定多个追踪算法。</p>
+              <p>指定纤维追踪算法。以空格分隔即可同时指定多个追踪算法。</p>
               <ul>
                 <li><code>ifod2</code> — 基于纤维方向分布的二阶积分（iFOD2）概率性追踪。需要 CSD。</li>
                 <li><code>sd_stream</code> — 基于球面反卷积的确定性 FOD 流线追踪。需要 CSD。</li>
                 <li><code>tensor_prob</code> — 基于张量的概率性追踪。需要 DTI。</li>
               </ul>
-              <p><strong>示例：</strong><code>--fiber_track_algorithm "ifod2"</code>、<code>"ifod2 sd_stream"</code>、<code>"ifod2 sd_stream tensor_prob"</code></p>
+              <p><strong>示例：</strong><code>--fiber-track-algorithm ifod2</code>、<code>ifod2 sd_stream</code>、<code>ifod2 sd_stream tensor_prob</code></p>
             </div>
           </div>
 
           <div class="param" id="p-fiber_track_select">
             <div class="param-head">
-              <span class="param-name">--fiber_track_select <span class="arg">&lt;N&gt;</span></span>
+              <span class="param-name">--fiber-track-select <span class="arg">&lt;N&gt;</span></span>
               <span class="badge badge-default">默认：10000000</span>
             </div>
             <div class="param-desc">
@@ -782,14 +802,14 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
               <ul>
                 <li><strong>常规处理：</strong>500 万条流线在计算成本与追踪质量之间取得较好平衡。</li>
                 <li><strong>更高质量连接组：</strong>计算时间充足时可使用 1000 万条流线。</li>
-                <li><strong>测试/调试：</strong>可降低该值，如 <code>--fiber_track_select 200000</code>。</li>
+                <li><strong>测试/调试：</strong>可降低该值，如 <code>--fiber-track-select 200000</code>。</li>
               </ul>
             </div>
           </div>
 
           <div class="param" id="p-fiber_track_minlength">
             <div class="param-head">
-              <span class="param-name">--fiber_track_minlength <span class="arg">&lt;N&gt;</span></span>
+              <span class="param-name">--fiber-track-minlength <span class="arg">&lt;N&gt;</span></span>
               <span class="badge badge-default">默认：5</span>
             </div>
             <div class="param-desc">
@@ -799,7 +819,7 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-fiber_track_maxlength">
             <div class="param-head">
-              <span class="param-name">--fiber_track_maxlength <span class="arg">&lt;N&gt;</span></span>
+              <span class="param-name">--fiber-track-maxlength <span class="arg">&lt;N&gt;</span></span>
               <span class="badge badge-default">默认：250</span>
             </div>
             <div class="param-desc">
@@ -809,11 +829,11 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-fiber_track_sift2">
             <div class="param-head">
-              <span class="param-name">--fiber_track_sift2</span>
+              <span class="param-name">--fiber-track-sift2</span>
               <span class="badge badge-flag">开关</span>
             </div>
             <div class="param-desc">
-              <p>在纤维追踪后应用 SIFT2 估计流线权重。此选项自动启用 <code>--dwi_fiber_track</code>。注意：若 <code>--fiber_track_algorithm</code> 中不包含 <code>ifod2</code>，OmniPrep 当前会使用基于 iFOD2 的追踪来生成 SIFT2 加权衍生数据。</p>
+              <p>在纤维追踪后应用 SIFT2 估计流线权重。此选项自动启用 <code>--dwi-fiber-track</code>。注意：若 <code>--fiber-track-algorithm</code> 中不包含 <code>ifod2</code>，OmniPrep 当前会使用基于 iFOD2 的追踪来生成 SIFT2 加权衍生数据。</p>
             </div>
           </div>
 
@@ -821,28 +841,28 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
 
           <div class="param" id="p-dwi_create_connectome">
             <div class="param-head">
-              <span class="param-name">--dwi_create_connectome</span>
+              <span class="param-name">--dwi-create-connectome</span>
               <span class="badge badge-flag">开关</span>
             </div>
             <div class="param-desc">
-              <p>基于纤维追踪输出构建基于图集的结构连接矩阵。需要通过 <code>--atlases "DK Brainnetome Glasser ..."</code> 指定图集。</p>
-              <p>自动启用 <code>--dwi_fiber_track</code> 与 <code>--dwi_cal_csd</code>。注意：若 <code>--fiber_track_algorithm</code> 中不包含 <code>ifod2</code>，OmniPrep 当前会基于 iFOD2 追踪构建结构连接组。</p>
+              <p>基于纤维追踪输出构建基于图集的结构连接矩阵。需要通过 <code>--atlases DK Brainnetome Glasser ...</code> 指定图集。</p>
+              <p>自动启用 <code>--dwi-fiber-track</code> 与 <code>--dwi-cal-csd</code>。注意：若 <code>--fiber-track-algorithm</code> 中不包含 <code>ifod2</code>，OmniPrep 当前会基于 iFOD2 追踪构建结构连接组。</p>
             </div>
           </div>
 
           <div class="param" id="p-dwi_fa_connectome">
             <div class="param-head">
-              <span class="param-name">--dwi_fa_connectome</span>
+              <span class="param-name">--dwi-fa-connectome</span>
               <span class="badge badge-flag">开关</span>
             </div>
             <div class="param-desc">
-              <p>计算 FA 加权的结构连接矩阵。自动启用 <code>--dwi_cal_dti</code>、<code>--dwi_create_connectome</code> 与 <code>--dwi_fiber_track</code>。</p>
+              <p>计算 FA 加权的结构连接矩阵。自动启用 <code>--dwi-cal-dti</code>、<code>--dwi-create-connectome</code> 与 <code>--dwi-fiber-track</code>。</p>
             </div>
           </div>
 
           <div class="param" id="p-tck2conn_scale_invnodevol">
             <div class="param-head">
-              <span class="param-name">--tck2conn_scale_invnodevol</span>
+              <span class="param-name">--tck2conn-scale-invnodevol</span>
               <span class="badge badge-flag">开关</span>
             </div>
             <div class="param-desc">
@@ -858,8 +878,8 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
           <div class="code-block">
             <div class="cb-head"><span class="cb-label">bash</span><button class="copy-btn">复制</button></div>
             <pre><code>omniprep-docker /data /out participant \
-  --fs_license_file /opt/freesurfer/license.txt \
-  --tasks "anat bold dwi" \
+  --fs-license-file /opt/freesurfer/license.txt \
+  --tasks anat bold dwi \
   [options]</code></pre>
           </div>
 
@@ -867,10 +887,10 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
           <div class="code-block">
             <div class="cb-head"><span class="cb-label">bash</span><button class="copy-btn">复制</button></div>
             <pre><code>omniprep-docker /data /out participant \
-  --fs_license_file /opt/freesurfer/license.txt \
-  --tasks "bold" \
-  --subjects_dir /out/Recon \
-  --participant_label "sub-001 sub-002" \
+  --fs-license-file /opt/freesurfer/license.txt \
+  --tasks bold \
+  --subjects-dir /out/Recon \
+  --participant-label sub-001 sub-002 \
   [options]</code></pre>
           </div>
 
@@ -878,31 +898,31 @@ omniprep-singularity  [bids_dir] [output_dir] [&#123;participant&#125;] [options
           <div class="code-block">
             <div class="cb-head"><span class="cb-label">bash</span><button class="copy-btn">复制</button></div>
             <pre><code>omniprep-docker /data /out participant \
-  --fs_license_file /opt/freesurfer/license.txt \
-  --tasks "bold" \
-  --bold_task_type "rest" \
-  --bold_denoise \
-  --bold_denoise_strategy motion24_wm_csf \
-  --bold_filter_mode bandpass \
-  --bold_bandpass "0.01-0.08" \
-  --bold_metrics "reho alff falff" \
-  --atlases "DK Brainnetome" \
-  --bold_roi_pearson_fc \
-  --bold_roi_fc_fisherz</code></pre>
+  --fs-license-file /opt/freesurfer/license.txt \
+  --tasks bold \
+  --bold-task-type rest \
+  --bold-denoise \
+  --bold-denoise-strategy motion24_wm_csf \
+  --bold-filter-mode bandpass \
+  --bold-bandpass 0.01-0.08 \
+  --bold-metrics reho alff falff \
+  --atlases DK Brainnetome \
+  --bold-roi-pearson-fc \
+  --bold-roi-fc-fisherz</code></pre>
           </div>
 
           <h3>DWI：CSD 纤维追踪与结构连接组</h3>
           <div class="code-block">
             <div class="cb-head"><span class="cb-label">bash</span><button class="copy-btn">复制</button></div>
             <pre><code>omniprep-docker /data /out participant \
-  --fs_license_file /opt/freesurfer/license.txt \
-  --tasks "dwi" \
-  --dwi_sdc_method auto \
-  --fiber_track_algorithm "ifod2" \
-  --fiber_track_select 10000000 \
-  --atlases "DK Brainnetome" \
-  --dwi_create_connectome \
-  --tck2conn_scale_invnodevol</code></pre>
+  --fs-license-file /opt/freesurfer/license.txt \
+  --tasks dwi \
+  --dwi-sdc-method auto \
+  --fiber-track-algorithm ifod2 \
+  --fiber-track-select 10000000 \
+  --atlases DK Brainnetome \
+  --dwi-create-connectome \
+  --tck2conn-scale-invnodevol</code></pre>
           </div>
         </section>
 
