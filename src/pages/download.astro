@@ -1,0 +1,96 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { site, downloads, latestReleaseUrl } from '../config';
+const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
+---
+<Layout lang="en" title="Download — OmniPrep" description="Download the OmniPrep desktop GUI and container images." active="download">
+
+    <section class="page-hero">
+      <div class="container">
+        <div class="breadcrumb"><a href={`${baseUrl}/`}>Home</a><span class="sep">/</span>Download</div>
+        <h1>Download OmniPrep</h1>
+        <p class="lead">Get the desktop GUI application or the container image. Downloads start directly from GitHub Releases — no need to access Docker Hub.</p>
+      </div>
+    </section>
+
+    <div class="container" style="padding:24px 24px 80px">
+
+      <!-- Desktop GUI -->
+      <section id="desktop" style="margin-bottom:56px">
+        <div class="section-head" style="text-align:left">
+          <span class="eyebrow">Desktop application · v{site.version}</span>
+          <h2 style="margin-bottom:8px">OmniPrep Desktop GUI</h2>
+          <p class="lead">A graphical interface for configuring and launching OmniPrep runs — no command line required.</p>
+        </div>
+
+        <div class="grid grid-3" style="margin-top:24px">
+          <div class="card" style="text-align:center">
+            <div class="card-icon blue" style="margin:0 auto 16px">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 22h8M12 18v4"/></svg>
+            </div>
+            <h3>Windows</h3>
+            <p style="min-height:48px">Installer for Windows 10 / 11 (x64).</p>
+            <div class="code-block" style="margin:0 auto 16px;max-width:100%"><pre><code>{downloads.gui.win.filename}</code></pre></div>
+            <a class="btn btn-primary" href={downloads.gui.win.url} download>Download</a>
+          </div>
+          <div class="card" style="text-align:center">
+            <div class="card-icon teal" style="margin:0 auto 16px">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+            </div>
+            <h3>macOS</h3>
+            <p style="min-height:48px">Universal build for Apple Silicon &amp; Intel.</p>
+            <div class="code-block" style="margin:0 auto 16px;max-width:100%"><pre><code>{downloads.gui.macos.filename}</code></pre></div>
+            <a class="btn btn-primary" href={downloads.gui.macos.url} download>Download</a>
+          </div>
+          <div class="card" style="text-align:center">
+            <div class="card-icon orange" style="margin:0 auto 16px">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+            </div>
+            <h3>Linux</h3>
+            <p style="min-height:48px">Debian / Ubuntu package (.deb, amd64).</p>
+            <div class="code-block" style="margin:0 auto 16px;max-width:100%"><pre><code>{downloads.gui.linux.filename}</code></pre></div>
+            <a class="btn btn-primary" href={downloads.gui.linux.url} download>Download</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Container image -->
+      <section id="container" style="margin-bottom:24px">
+        <div class="section-head" style="text-align:left">
+          <span class="eyebrow">Container image · v{site.version}</span>
+          <h2 style="margin-bottom:8px">Docker image (.tar.gz)</h2>
+          <p class="lead">A portable archive of the OmniPrep container image for environments where Docker Hub is blocked or slow. Load it locally with a single command.</p>
+        </div>
+
+        <div class="card" style="margin-top:24px">
+          <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+            <div class="card-icon blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8v13H3V8"/><path d="M1 3h22v5H1z"/><path d="M10 12h4"/></svg>
+            </div>
+            <div style="flex:1;min-width:240px">
+              <h3 style="margin-bottom:6px">{downloads.docker.filename}</h3>
+              <p style="color:var(--muted)">Import it into your local Docker daemon with <code>docker load</code>.</p>
+            </div>
+            <a class="btn btn-primary" href={downloads.docker.url} download>Download .tar.gz</a>
+          </div>
+
+          <div class="code-block" style="margin-top:20px">
+            <div class="cb-head"><span class="cb-label">bash — load the archive</span><button class="copy-btn">Copy</button></div>
+            <pre><code>docker load -i {downloads.docker.filename}
+docker run --rm uxhao/omniprep:latest --help</code></pre>
+          </div>
+
+          <div class="callout tip" style="margin-top:20px">
+            <svg class="ci" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <p><strong>Prefer Docker Hub?</strong> If it is reachable, you can still pull directly: <code>docker pull uxhao/omniprep:latest</code>.</p>
+          </div>
+        </div>
+      </section>
+
+      <p style="text-align:center;color:var(--muted);margin-top:40px">
+        Looking for an older release or all assets? Browse the <a href={latestReleaseUrl} target="_blank" rel="noopener">GitHub releases page</a>.
+      </p>
+
+    </div>
+
+</Layout>

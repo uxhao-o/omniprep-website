@@ -9,15 +9,17 @@ const base = `${baseUrl}${zh ? '/zh' : ''}`;
 const links = zh
   ? [
       { href: `${base}/`, key: 'home', label: '首页' },
+      { href: `${base}/download/`, key: 'download', label: '下载' },
       { href: `${base}/getting-started/`, key: 'start', label: '快速开始' },
-      { href: `${base}/documentation/`, key: 'docs', label: '文档' },
+      { href: `${base}/docs/`, key: 'docs', label: '文档' },
       { href: `${base}/changelog/`, key: 'log', label: '更新日志' },
       { href: `${base}/about/`, key: 'about', label: '关于' },
     ]
   : [
       { href: `${base}/`, key: 'home', label: 'Home' },
+      { href: `${base}/download/`, key: 'download', label: 'Download' },
       { href: `${base}/getting-started/`, key: 'start', label: 'Getting Started' },
-      { href: `${base}/documentation/`, key: 'docs', label: 'Documentation' },
+      { href: `${base}/docs/`, key: 'docs', label: 'Documentation' },
       { href: `${base}/changelog/`, key: 'log', label: 'Changelog' },
       { href: `${base}/about/`, key: 'about', label: 'About' },
     ];

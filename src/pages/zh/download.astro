@@ -1,0 +1,96 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { site, downloads, latestReleaseUrl } from '../../config';
+const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
+---
+<Layout lang="zh" title="下载 — OmniPrep" description="下载 OmniPrep 桌面 GUI 与容器镜像。" active="download">
+
+    <section class="page-hero">
+      <div class="container">
+        <div class="breadcrumb"><a href={`${baseUrl}/zh/`}>首页</a><span class="sep">/</span>下载</div>
+        <h1>下载 OmniPrep</h1>
+        <p class="lead">获取桌面 GUI 应用或容器镜像。下载直接从 GitHub Releases 开始，无需访问 Docker Hub。</p>
+      </div>
+    </section>
+
+    <div class="container" style="padding:24px 24px 80px">
+
+      <!-- 桌面 GUI -->
+      <section id="desktop" style="margin-bottom:56px">
+        <div class="section-head" style="text-align:left">
+          <span class="eyebrow">桌面应用 · v{site.version}</span>
+          <h2 style="margin-bottom:8px">OmniPrep 桌面 GUI</h2>
+          <p class="lead">图形化配置与启动 OmniPrep 运行的界面，无需命令行。</p>
+        </div>
+
+        <div class="grid grid-3" style="margin-top:24px">
+          <div class="card" style="text-align:center">
+            <div class="card-icon blue" style="margin:0 auto 16px">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 22h8M12 18v4"/></svg>
+            </div>
+            <h3>Windows</h3>
+            <p style="min-height:48px">适用于 Windows 10 / 11（x64）的安装包。</p>
+            <div class="code-block" style="margin:0 auto 16px;max-width:100%"><pre><code>{downloads.gui.win.filename}</code></pre></div>
+            <a class="btn btn-primary" href={downloads.gui.win.url} download>下载</a>
+          </div>
+          <div class="card" style="text-align:center">
+            <div class="card-icon teal" style="margin:0 auto 16px">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+            </div>
+            <h3>macOS</h3>
+            <p style="min-height:48px">适用于 Apple Silicon 与 Intel 的通用版本。</p>
+            <div class="code-block" style="margin:0 auto 16px;max-width:100%"><pre><code>{downloads.gui.macos.filename}</code></pre></div>
+            <a class="btn btn-primary" href={downloads.gui.macos.url} download>下载</a>
+          </div>
+          <div class="card" style="text-align:center">
+            <div class="card-icon orange" style="margin:0 auto 16px">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+            </div>
+            <h3>Linux</h3>
+            <p style="min-height:48px">Debian / Ubuntu 安装包（.deb，amd64）。</p>
+            <div class="code-block" style="margin:0 auto 16px;max-width:100%"><pre><code>{downloads.gui.linux.filename}</code></pre></div>
+            <a class="btn btn-primary" href={downloads.gui.linux.url} download>下载</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- 容器镜像 -->
+      <section id="container" style="margin-bottom:24px">
+        <div class="section-head" style="text-align:left">
+          <span class="eyebrow">容器镜像 · v{site.version}</span>
+          <h2 style="margin-bottom:8px">Docker 镜像（.tar.gz）</h2>
+          <p class="lead">OmniPrep 容器镜像的可移植归档，适用于无法访问或访问 Docker Hub 较慢的环境。下载后用一条命令即可导入本地。</p>
+        </div>
+
+        <div class="card" style="margin-top:24px">
+          <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+            <div class="card-icon blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8v13H3V8"/><path d="M1 3h22v5H1z"/><path d="M10 12h4"/></svg>
+            </div>
+            <div style="flex:1;min-width:240px">
+              <h3 style="margin-bottom:6px">{downloads.docker.filename}</h3>
+              <p style="color:var(--muted)">使用 <code>docker load</code> 导入本地 Docker 守护进程。</p>
+            </div>
+            <a class="btn btn-primary" href={downloads.docker.url} download>下载 .tar.gz</a>
+          </div>
+
+          <div class="code-block" style="margin-top:20px">
+            <div class="cb-head"><span class="cb-label">bash — 导入归档</span><button class="copy-btn">Copy</button></div>
+            <pre><code>docker load -i {downloads.docker.filename}
+docker run --rm uxhao/omniprep:latest --help</code></pre>
+          </div>
+
+          <div class="callout tip" style="margin-top:20px">
+            <svg class="ci" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <p><strong>更想用 Docker Hub？</strong> 若网络可达，仍可直接拉取：<code>docker pull uxhao/omniprep:latest</code>。</p>
+          </div>
+        </div>
+      </section>
+
+      <p style="text-align:center;color:var(--muted);margin-top:40px">
+        需要旧版本或查看全部资产？请浏览 <a href={latestReleaseUrl} target="_blank" rel="noopener">GitHub releases 页面</a>。
+      </p>
+
+    </div>
+
+</Layout>
