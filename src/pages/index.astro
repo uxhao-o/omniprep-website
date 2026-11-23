@@ -8,7 +8,7 @@ const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
     <!-- HERO -->
     <section class="hero">
       <div class="container">
-        <span class="hero-badge"><span class="dot"></span> Multi-modal · Scalable · Reproducible</span>
+        <span class="hero-badge"><span class="dot"></span> Unified · Multimodal · Analysis-ready</span>
         <h1>A Unified Pipeline for <span class="grad">Accelerating</span> <span class="grad grad-2">Large-Scale Multimodal MRI Research</span></h1>
         <p class="hero-sub">
             OmniPrep unifies sMRI, dMRI, and fMRI preprocessing and downstream analysis, from atlas-based ROI features to connectomics, accelerated by deep learning and parallel computing.
@@ -179,7 +179,7 @@ const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
               <li>ROI-level morphometry</li>
               <li>Native &amp; MNI-space surfaces</li>
             </ul>
-            <a class="more" href={`${baseUrl}/docs/#general-options`}>Learn more →</a>
+            <a class="more" href={`${baseUrl}/docs/reference/#general-options`}>Learn more ↗</a>
           </div>
           <div class="modality-card bold">
             <span class="modality-badge">bold</span>
@@ -191,7 +191,7 @@ const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
               <li>ROI time series &amp; FC matrices</li>
               <li>CIFTI &amp; surface outputs</li>
             </ul>
-            <a class="more" href={`${baseUrl}/docs/#bold-options`}>Learn more →</a>
+            <a class="more" href={`${baseUrl}/docs/reference/#bold-options`}>Learn more ↗</a>
           </div>
           <div class="modality-card dwi">
             <span class="modality-badge">dwi</span>
@@ -203,7 +203,7 @@ const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
               <li>Whole-brain tractography</li>
               <li>Structural connectomes</li>
             </ul>
-            <a class="more" href={`${baseUrl}/docs/#dwi-options`}>Learn more →</a>
+            <a class="more" href={`${baseUrl}/docs/reference/#dwi-options`}>Learn more ↗</a>
           </div>
         </div>
       </div>
@@ -260,16 +260,18 @@ const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
                 <span class="pill hl">BOLD/</span>
                 <span class="pill hl">DWI/</span>
                 <span class="pill hl">QC/</span>
+                <span class="pill hl">LUT/</span>
                 <span class="pill">report.html</span>
                 <span class="pill">timeline.html</span>
               </div>
               <ul style="margin-top:16px;padding-left:20px;color:var(--muted);font-size:.93rem">
-                <li>FreeSurfer reconstruction &amp; morphometry</li>
-                <li>Denoised BOLD + voxel/ROI metrics</li>
-                <li>Tractography &amp; connectomes</li>
+                <li>Cortical / volumetric reconstruction &amp; morphometry</li>
+                <li>Denoised BOLD + voxel/ROI metrics &amp; functional connectivity (FC)</li>
+                <li>DTI metrics &amp; Tractography &amp; structural connectomes (SC)</li>
                 <li>Automated QC reports</li>
+                <li>Subject-exclusion suggestions by max head motion</li>
               </ul>
-              <a class="btn btn-primary" style="margin-top:16px" href={`${baseUrl}/getting-started/`}>View full guide →</a>
+              <a class="btn btn-primary" style="margin-top:16px" href={`${baseUrl}/getting-started/`}>View full guide ↗</a>
             </div>
           </div>
         </div>
@@ -279,7 +281,7 @@ const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
     <!-- CTA -->
     <section class="section soft">
       <div class="container" style="text-align:center;max-width:720px">
-        <h2>Ready to preprocess at scale?</h2>
+        <h2>Ready to analyze at scale?</h2>
         <p class="lead" style="color:var(--muted);margin-bottom:28px">
           Read the documentation to explore every option, or jump straight into installation.
         </p>

@@ -1,0 +1,164 @@
+---
+import Layout from '../../layouts/Layout.astro';
+const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
+---
+<Layout lang="en" title="Outputs &amp; Derivatives — OmniPrep" description="OmniPrep — unified multimodal MRI preprocessing and analysis pipeline." active="docs">
+
+    <section class="page-hero">
+      <div class="container">
+        <div class="breadcrumb"><a href={`${baseUrl}/`}>Home</a><span class="sep">/</span><a href={`${baseUrl}/docs/`}>Documentation</a><span class="sep">/</span>Outputs &amp; derivatives</div>
+        <h1>Outputs &amp; Derivatives</h1>
+        <p class="lead">Everything OmniPrep writes under <code>derivatives/omniprep/</code>, organized by modality — preprocessing results plus analysis-ready derivatives.</p>
+      </div>
+    </section>
+
+    <div class="docs-layout container">
+      <aside class="toc">
+        <div class="toc-title">On this page</div>
+        <ul>
+          <li><a class="level-1" href="#outputs">Outputs &amp; derivatives</a></li>
+          <li><a href="#outputs-recon">Structural results</a></li>
+          <li><a href="#outputs-bold">Functional results</a></li>
+          <li><a href="#outputs-dwi">Diffusion results</a></li>
+          <li><a href="#outputs-qc">Quality control</a></li>
+          <li><a href="#outputs-lut">Atlas look-up tables</a></li>
+          <li><a href="#outputs-spaces">Optional spaces &amp; formats</a></li>
+        </ul>
+      </aside>
+
+      <article class="doc-content">
+
+        <section id="outputs">
+          <h2>Outputs &amp; derivatives</h2>
+          <p class="lead-copy">Everything is written under <code>&lt;output_dir&gt;/derivatives/omniprep/</code>, organized by modality, and follows BIDS derivatives conventions.</p>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">output tree</span><button class="copy-btn">Copy</button></div>
+            <pre><code>output_dir/
+└── derivatives/
+    └── omniprep/
+        ├── Recon/        # structural: segmentation, surfaces, morphometry
+        ├── BOLD/         # denoised BOLD + voxel/ROI metrics + time series
+        ├── DWI/          # DTI/CSD metrics, tractography, connectomes
+        ├── QC/           # run report, trace, timeline, motion/QC figures
+        ├── LUT/          # merged atlas look-up tables (cortex + subcortex + cerebellum)
+        ├── WorkDir/      # Nextflow work &amp; runtime state
+        └── dataset_description.json</code></pre>
+          </div>
+
+          <h3 id="outputs-recon">Structural results (Recon/)</h3>
+          <p>Anatomical derivatives produced by the FreeSurfer-style reconstruction are stored in <code>Recon/</code>, one folder per subject (and session, if present):</p>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">Recon/</span><button class="copy-btn">Copy</button></div>
+            <pre><code>Recon/
+├── fsaverage/            # template surfaces
+├── fsaverage6/           # low-res template surfaces
+└── sub-&lt;subject_label&gt;[_ses-&lt;label&gt;]/
+    ├── label/            # cortical parcellations (lh./rh. + per-atlas .annot/.ctab)
+    ├── mri/              # normalized/skull-stripped T1w, aseg/aparc+aseg, registration
+    ├── surf/             # reconstructed cortical surfaces &amp; morphometry
+    ├── stats/            # per-atlas parcellation statistics
+    └── scripts/          # processing scripts &amp; logs</code></pre>
+          </div>
+          <p>Contents follow FreeSurfer conventions: the normalized, skull-stripped brain; reconstructed cortical surfaces and morphometry (under <code>surf/</code>); volumetric segmentation (<code>mri/aseg.mgz</code>) plus per-atlas <code>aparc.&lt;Atlas&gt;+aseg.mgz</code>; and cortical surface parcellations (<code>label/</code>) with per-region statistics (<code>stats/</code>).</p>
+          <p class="xref"><strong>Related:</strong> see the sMRI workflow in <a href={`${baseUrl}/docs/pipeline/#pipeline-smri`}>Processing pipeline ↗</a> · configure the atlases with <a href={`${baseUrl}/docs/reference/#atlas-options`}>atlas options ↗</a></p>
+
+          <h3 id="outputs-bold">Functional results (BOLD/)</h3>
+          <p>Preprocessed BOLD data follows the BIDS derivatives layout, with per-subject <code>anat/</code> and <code>func/</code> subfolders. A <code>ses-&lt;label&gt;/</code> level appears only when the source BIDS dataset has a session level:</p>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">BOLD/</span><button class="copy-btn">Copy</button></div>
+            <pre><code>BOLD/
+└── sub-&lt;subject_label&gt;/
+    [└── ses-&lt;label&gt;/]
+        ├── anat/    # preprocessed T1w, brain mask, per-atlas aparcaseg dseg
+        └── func/    # preproc BOLD, masks, confounds, transforms, ROI metrics &amp; FC
+dataset_description.json</code></pre>
+          </div>
+          <p><strong>Default output spaces:</strong> (1) native BOLD space, (2) <code>MNI152NLin2009cAsym</code> volume, (3) <code>fsaverage6</code> surface. Other TemplateFlow volume/surface templates and native T1w space can be requested.</p>
+          <p><strong>Main outputs include:</strong> preprocessed fMRI (<code>desc-preproc_bold.nii.gz</code>); denoised variants (<code>desc-bandpassMotion24WmCsfGsr[_FWHM4/6]_bold.nii.gz</code>); motion-corrected reference volume; brain / ventricle / WM masks; transforms (T1w↔BOLD-ref, T1w↔template); head-motion parameters and confound regressors; and atlas-level derivatives — voxelwise maps (ReHo / ALFF / fALFF / INT and their smoothed variants) plus per-atlas ROI time series, ROI metrics, and Pearson functional-connectivity matrices (<code>desc-pearsonFC_connectivity.csv</code>).</p>
+          <p class="xref"><strong>Related:</strong> see the BOLD workflow in <a href={`${baseUrl}/docs/pipeline/#pipeline-fmri`}>Processing pipeline ↗</a> · full <a href={`${baseUrl}/docs/reference/#bold-options`}>BOLD options ↗</a></p>
+
+          <h3 id="outputs-dwi">Diffusion results (DWI/)</h3>
+          <p>Preprocessed DWI follows the BIDS derivatives layout. Each subject folder contains only <code>anat/</code> and <code>dwi/</code> (with a <code>ses-&lt;label&gt;/</code> level only when the source dataset has one); all DWI preprocessing outputs and derived results live directly under <code>dwi/</code>, distinguished by <code>desc-</code> labels rather than subfolders:</p>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">DWI/</span><button class="copy-btn">Copy</button></div>
+            <pre><code>DWI/
+└── sub-&lt;subject_label&gt;/
+    [└── ses-&lt;label&gt;/]
+        ├── anat/    # preprocessed T1w, brain mask, per-atlas aparcaseg dseg (ACPC space)
+        └── dwi/     # preprocessed DWI + all derivatives (flat, desc- labeled)
+dataset_description.json</code></pre>
+          </div>
+          <p><strong>Main outputs include:</strong> denoised, eddy- and distortion-corrected DWI (<code>desc-preproc_dwi.nii.gz</code> + <code>.bval</code>/<code>.bvec</code>); DTI tensor and scalar maps (<code>desc-dti_tensor.mif</code>, <code>desc-dti_fa/md/ad/rd/cl/cp/cs.nii.gz</code>); CSD white-/grey-/CSF FODs (<code>desc-csd_wmfod.mif</code> etc.); 5-tissue-type segmentation (<code>_5ttseg.mif</code>); whole-brain tractograms (<code>desc-ifod2ACT5m_tractogram.tck</code>, with SIFT2 weights); and per-atlas structural connectomes (<code>desc-ifod2ACT5mSIFT2_connectome.csv</code>, <code>...MeanFA_connectome.csv</code>, <code>..._assignments.csv</code>).</p>
+          <p class="xref"><strong>Related:</strong> see the dMRI workflow in <a href={`${baseUrl}/docs/pipeline/#pipeline-dmri`}>Processing pipeline ↗</a> · full <a href={`${baseUrl}/docs/reference/#dwi-options`}>DWI options ↗</a></p>
+
+          <h3 id="outputs-qc">Quality control (QC/)</h3>
+          <p>OmniPrep generates a per-subject HTML report plus run-level summaries and figures for quick visual inspection:</p>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">QC/</span><button class="copy-btn">Copy</button></div>
+            <pre><code>QC/
+├── sub-&lt;subject_label&gt;/
+│   ├── figures/            # per-stage figures &amp; reports (T1w, BOLD, DWI)
+│   └── sub-&lt;subject_label&gt;.html   # per-subject report
+├── report_&lt;timestamp&gt;.html        # run-level report
+├── timeline_&lt;timestamp&gt;.html      # resource / execution timeline
+├── trace_&lt;timestamp&gt;.txt          # execution trace
+├── nextflow.run.command           # exact command used
+├── nextflow.run.config            # resolved config
+├── QC_bold_SubjectsHeadMotion_metrics.tsv   # group head-motion metrics
+├── QC_bold_SubjectsRetainedVolumes_summary.tsv
+├── QC_bold_ExcludeSubjectsAccordingToMaxHeadMotion.txt  # subjects to exclude by max head motion
+└── dataset_description.json</code></pre>
+          </div>
+
+          <h3 id="outputs-lut">Atlas look-up tables (LUT/)</h3>
+          <p>When atlases are requested via <code>--cortex-atlas</code>, <code>--subcortex-atlas</code>, and <code>--cerebellum-atlas</code>, OmniPrep <strong>dynamically merges</strong> the requested atlases into a single, conflict-free numbering space at run time and writes the merged look-up tables to <code>LUT/</code>:</p>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">LUT/</span><button class="copy-btn">Copy</button></div>
+            <pre><code>LUT/
+├── atlas-&lt;cortex-atlas&gt;_subcortex-&lt;subcortex-atlas&gt;_cerebellum-&lt;cerebellum-atlas&gt;_desc-original_LUT.txt
+└── atlas-&lt;cortex-atlas&gt;_subcortex-&lt;subcortex-atlas&gt;_cerebellum-&lt;cerebellum-atlas&gt;_desc-ordered_LUT.txt</code></pre>
+          </div>
+          <p>The <code>LUT/</code> directory holds <strong>only the merged look-up tables</strong> — it does not store separate cortex / subcortex / cerebellum LUT files. Each cortical atlas is merged individually with the subcortical and cerebellar atlases, producing one pair of files per cortical atlas:</p>
+          <ul>
+            <li><code>atlas-..._desc-original_LUT.txt</code> — the atlases concatenated with their <strong>original</strong> labels preserved.</li>
+            <li><code>atlas-..._desc-ordered_LUT.txt</code> — the same regions re-mapped to a <strong>sequential, non-overlapping</strong> label order, suitable for downstream metrics and connectomes.</li>
+          </ul>
+          <p>If <code>--cortex-atlas</code> lists <strong>N</strong> cortical atlases, <strong>N × 2</strong> merged LUT files are generated (one <code>desc-original</code> + one <code>desc-ordered</code> per cortical atlas). The filename follows <strong>BIDS-derivatives naming</strong>: the <code>atlas-</code> entity carries a single cortical atlas, and the <code>desc-</code> entity distinguishes the original from the re-ordered numbering. For example, <code>--cortex-atlas DK Glasser Schaefer100P7N --subcortex-atlas Brainnetome --cerebellum-atlas SUIT</code> produces 3 × 2 = 6 files:</p>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">example</span><button class="copy-btn">Copy</button></div>
+            <pre><code>atlas-DK_subcortex-Brainnetome_cerebellum-SUIT_desc-original_LUT.txt
+atlas-DK_subcortex-Brainnetome_cerebellum-SUIT_desc-ordered_LUT.txt
+atlas-Glasser_subcortex-Brainnetome_cerebellum-SUIT_desc-original_LUT.txt
+atlas-Glasser_subcortex-Brainnetome_cerebellum-SUIT_desc-ordered_LUT.txt
+atlas-Schaefer100P7N_subcortex-Brainnetome_cerebellum-SUIT_desc-original_LUT.txt
+atlas-Schaefer100P7N_subcortex-Brainnetome_cerebellum-SUIT_desc-ordered_LUT.txt</code></pre>
+          </div>
+          <div class="callout note">
+            <svg class="ci" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 16H3z"/><path d="M12 9v4M12 16h.01"/></svg>
+            <p>When <code>--subcortex-atlas</code> or <code>--cerebellum-atlas</code> is not specified, the corresponding tag keeps its literal <code>none</code> value — for example <code>atlas-DK_subcortex-none_cerebellum-none_desc-original_LUT.txt</code>. No subcortical or cerebellar atlas is merged in that case.</p>
+          </div>
+          <p class="xref"><strong>Related:</strong> configure the three atlas parameters in <a href={`${baseUrl}/docs/reference/#atlas-options`}>Atlas &amp; ROI options ↗</a></p>
+
+          <h3 id="outputs-spaces">Optional output spaces &amp; formats</h3>
+          <p>In addition to NIfTI, OmniPrep can emit <strong>CIFTI</strong> (dense connectome format combining volume + surface, excluding medial wall / WM / CSF) and <strong>GIFTI</strong> (surface geometry) files. With <code>--bold-cifti</code>, results are generated in the <code>fsLR</code> 91k-resolution space, matching HCP Pipelines CIFTI output, including surface metrics such as sulcal depth (<code>sulc</code>), cortical thickness (<code>thickness</code>), and curvature (<code>curv</code>).</p>
+
+          <div class="table-wrap">
+            <table class="summary-table">
+              <thead><tr><th>Modality</th><th>Preprocessed output</th><th>Analysis-ready derivatives</th></tr></thead>
+              <tbody>
+                <tr><td><strong>sMRI (T1w)</strong></td><td>Bias-corrected T1w, brain mask, volumetric segmentation</td><td>Cortical surfaces, parcellations, ROI morphometry (thickness / area / volume)</td></tr>
+                <tr><td><strong>fMRI (BOLD)</strong></td><td>Motion- &amp; distortion-corrected, normalized BOLD (vol + surface)</td><td>Denoised BOLD, ROI time series, ReHo / ALFF / fALFF, ROI functional connectivity</td></tr>
+                <tr><td><strong>dMRI (DWI)</strong></td><td>Denoised, eddy- &amp; distortion-corrected DWI</td><td>DTI / CSD metrics, tractograms, structural connectomes</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout tip">
+            <svg class="ci" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <p>The <strong>analysis-ready</strong> layer is what sets OmniPrep apart from a pure preprocessing pipeline: the output feeds directly into morphometry, connectomics, and statistical modeling without extra tooling.</p>
+          </div>
+        </section>
+
+      </article>
+    </div>
+
+</Layout>

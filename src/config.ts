@@ -17,7 +17,7 @@ export const site = {
   /** Deployment base path ('' for apex, '/omniprep-website' for a project repo). */
   basePath: '',
   /** Current pipeline version (also drives versioned-docs release names). */
-  version: '26.2.1',
+  version: '26.3.1',
 };
 
 export const repoUrl = `https://github.com/${site.githubUser}/${site.githubRepo}`;

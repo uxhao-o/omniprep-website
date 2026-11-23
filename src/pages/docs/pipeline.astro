@@ -1,0 +1,186 @@
+---
+import Layout from '../../layouts/Layout.astro';
+const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
+---
+<Layout lang="en" title="Processing Pipeline &amp; Deep-Learning Models — OmniPrep" description="OmniPrep — unified multimodal MRI preprocessing and analysis pipeline." active="docs">
+
+    <section class="page-hero">
+      <div class="container">
+        <div class="breadcrumb"><a href={`${baseUrl}/`}>Home</a><span class="sep">/</span><a href={`${baseUrl}/docs/`}>Documentation</a><span class="sep">/</span>Processing pipeline</div>
+        <h1>Processing Pipeline</h1>
+        <p class="lead">How OmniPrep preprocesses structural, functional and diffusion images, and the deep-learning models that accelerate the slowest stages.</p>
+      </div>
+    </section>
+
+    <div class="docs-layout container">
+      <aside class="toc">
+        <div class="toc-title">On this page</div>
+        <ul>
+          <li><a class="level-1" href="#pipeline">Processing pipeline</a></li>
+          <li><a href="#pipeline-smri">Structural (T1w)</a></li>
+          <li><a href="#pipeline-fmri">Functional (BOLD)</a></li>
+          <li><a href="#pipeline-dmri">Diffusion (dMRI)</a></li>
+          <li><a class="level-1" href="#deep-learning-models">Deep-learning models</a></li>
+        </ul>
+      </aside>
+
+      <article class="doc-content">
+
+        <section id="pipeline">
+          <h2>Processing pipeline</h2>
+          <p class="lead-copy">OmniPrep preprocesses structural and functional images in a unified workflow, adding analysis-ready derivatives (atlas-based morphometry, ROI time series, functional/structural connectomes) on top. Deep-learning steps replace the slowest traditional stages; the rest stays consistent with FreeSurfer / fMRIPrep for reliability.</p>
+
+          <h3 id="pipeline-smri">Structural MRI (T1w)</h3>
+          <p>The workflow mirrors FreeSurfer v8.2.0's <code>recon-all</code> sequence, with three deep-learning replacements for the slowest stages. Steps in order:</p>
+          <ol class="steps">
+            <li>
+              <h4>Motion correction</h4>
+              <p>If multiple T1w scans exist per session, <code>recon-all -motioncor</code> aligns them and averages into a single motion-minimized T1w image.</p>
+            </li>
+            <li>
+              <h4>Volumetric segmentation <span class="pill hl">deep learning</span></h4>
+              <p><strong>FastSurferCNN</strong> segments the whole brain into cortical + subcortical regions — replacing FreeSurfer's most time-consuming volumetric step.</p>
+            </li>
+            <li>
+              <h4>N4 bias-field correction</h4>
+              <p>Intensity normalization via N4 (SimpleITK), referencing a brain mask derived from the segmentation.</p>
+            </li>
+            <li>
+              <h4>Talairach transform, skull stripping &amp; normalization</h4>
+              <p>Standard FreeSurfer steps: Talairach coordinate transform, robust skull stripping from the segmentation mask, and intensity normalization.</p>
+            </li>
+            <li>
+              <h4>Cortical surface reconstruction <span class="pill hl">deep learning</span></h4>
+              <p><strong>FastCSR</strong> reconstructs white-matter and pial surfaces (topology-preserving), followed by white-matter fill and subcortical labeling.</p>
+            </li>
+            <li>
+              <h4>Surface inflation &amp; spherical projection</h4>
+              <p><code>mris_sphere</code> inflates and projects each surface to a sphere with minimal distortion.</p>
+            </li>
+            <li>
+              <h4>Cortical surface registration <span class="pill hl">deep learning</span></h4>
+              <p><strong>SUGAR</strong> performs rigid + non-rigid spherical registration, aligning each subject's surface to the <code>fsaverage</code> template in seconds (Jacobian computed for morphometry).</p>
+            </li>
+            <li>
+              <h4>Cortical parcellation &amp; morphometry</h4>
+              <p><code>recon-all -cortparc</code> labels the cortex; <code>mri_surf2volseg</code> projects labels back into the volume. Thickness / area / volume and statistics follow FreeSurfer conventions.</p>
+            </li>
+          </ol>
+          <p class="xref"><strong>Related:</strong> choose the parcellation atlases with <a href={`${baseUrl}/docs/reference/#atlas-options`}><code>--cortex-atlas</code> / <code>--subcortex-atlas</code> / <code>--cerebellum-atlas</code> ↗</a> · see what lands in <a href={`${baseUrl}/docs/outputs/#outputs-recon`}>Recon/ ↗</a></p>
+
+          <h3 id="pipeline-fmri">Functional MRI (BOLD)</h3>
+          <ol class="steps">
+            <li>
+              <h4>Motion &amp; slice-timing correction</h4>
+              <p>Head motion is estimated with <strong>MCFLIRT</strong> (FSL), reference = middle volume (or averaged dummy scans). Slice-timing correction via <strong>3dTshift</strong> (AFNI) when BIDS metadata includes slice times (optional).</p>
+            </li>
+            <li>
+              <h4>Susceptibility distortion correction (optional)</h4>
+              <p><strong>SDCFlows</strong> estimates B0 field-inhomogeneity maps and corrects distortions when fieldmap data is available.</p>
+            </li>
+            <li>
+              <h4>Co-registration</h4>
+              <p>FreeSurfer's <strong>boundary-based registration (BBR)</strong> rigidly aligns motion-corrected BOLD to the native T1w, optimizing the gray/white boundary.</p>
+            </li>
+            <li>
+              <h4>Spatial normalization <span class="pill hl">deep learning</span></h4>
+              <p><strong>SynthMorph</strong> performs rigid + non-rigid volumetric registration in under a minute; <strong>SUGAR</strong> handles cortical surface alignment. BOLD is projected to <code>MNI152NLin6Asym</code> and <code>fsaverage6</code> by default (other TemplateFlow spaces supported).</p>
+            </li>
+            <li>
+              <h4>Denoising &amp; confounds (optional)</h4>
+              <p>Nuisance regression (motion parameters, WM/CSF signals, etc.), motion scrubbing, and band-pass filtering — controlled by the <a href={`${baseUrl}/docs/reference/#bold-denoise`}>denoising options</a>.</p>
+            </li>
+            <li>
+              <h4>Analysis-ready derivatives (OmniPrep extra)</h4>
+              <p>ROI time series, local metrics (ReHo/ALFF/fALFF), and ROI functional connectivity are extracted into CIFTI/NIfTI and tabular outputs.</p>
+            </li>
+          </ol>
+          <p class="xref"><strong>Related:</strong> full BOLD options at <a href={`${baseUrl}/docs/reference/#bold-options`}>BOLD fMRI options ↗</a> · see what lands in <a href={`${baseUrl}/docs/outputs/#outputs-bold`}>BOLD/ ↗</a></p>
+
+          <h3 id="pipeline-dmri">Diffusion MRI (dMRI)</h3>
+          <ol class="steps">
+            <li>
+              <h4>Denoising &amp; distortion correction <span class="pill hl">deep learning</span></h4>
+              <p>dMRI denoising, eddy-current / motion correction, and B0-field unwarping (fieldmap-based or <code>--dwi-sdc-method</code> strategies), accelerated by deep-learning denoising and distortion correction.</p>
+            </li>
+            <li>
+              <h4>Tensor &amp; fiber-orientation modeling</h4>
+              <p>DTI metrics (FA/MD/AD/RD) and constrained spherical deconvolution (CSD) fiber orientation distributions.</p>
+            </li>
+            <li>
+              <h4>Tractography</h4>
+              <p>Deterministic and probabilistic (iFOD1/iFOD2) whole-brain tractography with SIFT2 filtering.</p>
+            </li>
+            <li>
+              <h4>Analysis-ready derivatives</h4>
+              <p>Structural connectomes (weighted by streamline count / FA, optional inverse-node-volume scaling), plus atlas-based DWI features.</p>
+            </li>
+          </ol>
+          <p class="xref"><strong>Related:</strong> full DWI options at <a href={`${baseUrl}/docs/reference/#dwi-options`}>DWI options ↗</a> · see what lands in <a href={`${baseUrl}/docs/outputs/#outputs-dwi`}>DWI/ ↗</a></p>
+          <div class="callout note">
+            <svg class="ci" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            <p>For <strong>infant and pediatric cohorts</strong>, the same deep-learning pipeline applies: the age-matched templates (<code>MNIInfant</code> / <code>MNIPediatric</code>) are selected automatically from <code>--age-group</code>, and <strong>SynthMorph</strong> — whose training data includes infant scans — drives the volumetric spatial normalization for these developing brains.</p>
+          </div>
+        </section>
+
+        <section id="deep-learning-models">
+          <h2>Deep-learning models</h2>
+          <p class="lead-copy">OmniPrep uses four deep-learning modules that replace the most time-consuming traditional stages while preserving FreeSurfer / fMRIPrep reliability everywhere else. Each model is introduced below.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Model</th><th>Replaces</th><th>Used in</th><th>Speed</th></tr></thead>
+              <tbody>
+                <tr><td><strong>FastSurferCNN</strong></td><td>Volumetric segmentation</td><td>sMRI (T1w)</td><td>~1 min</td></tr>
+                <tr><td><strong>FastCSR</strong></td><td>Cortical surface reconstruction</td><td>sMRI (T1w)</td><td>—</td></tr>
+                <tr><td><strong>SUGAR</strong></td><td>Cortical surface registration</td><td>sMRI + BOLD surface</td><td>seconds</td></tr>
+                <tr><td><strong>SynthMorph</strong></td><td>Volumetric spatial normalization</td><td>BOLD + infant/pediatric</td><td>&lt; 1 min</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="param">
+            <div class="param-head">
+              <span class="param-name">FastSurferCNN — volumetric segmentation</span>
+              <span class="badge badge-type">sMRI</span>
+            </div>
+            <div class="param-desc">
+              <p>A deep-learning architecture that aggregates multi-slice information to segment the whole brain into <strong>95 cortical and subcortical structures</strong>, using competitive dense blocks and skip-path connections. It replaces FreeSurfer's slowest volumetric step and completes a precise whole-brain segmentation in roughly <strong>one minute</strong>.</p>
+            </div>
+          </div>
+
+          <div class="param">
+            <div class="param-head">
+              <span class="param-name">FastCSR — cortical surface reconstruction</span>
+              <span class="badge badge-type">sMRI</span>
+            </div>
+            <div class="param-desc">
+              <p>Reconstructs the <strong>white-matter and pial surfaces</strong> from the FastSurferCNN segmentation. It represents the cortical surface implicitly via a <strong>level-set representation</strong> and applies a <strong>topology-preserving</strong> surface extraction to yield triangulated meshes, dramatically accelerating surface reconstruction.</p>
+            </div>
+          </div>
+
+          <div class="param">
+            <div class="param-head">
+              <span class="param-name">SUGAR — cortical surface registration</span>
+              <span class="badge badge-type">sMRI + BOLD</span>
+            </div>
+            <div class="param-desc">
+              <p>Spherical ultrafast graph-attention framework for cortical surface registration. It performs both <strong>rigid and non-rigid spherical registration</strong> to align individual surfaces to the <code>fsaverage</code> template in <strong>seconds</strong>, computing the Jacobian for morphometry along the way.</p>
+            </div>
+          </div>
+
+          <div class="param">
+            <div class="param-head">
+              <span class="param-name">SynthMorph — volumetric spatial normalization</span>
+              <span class="badge badge-type">BOLD + infant</span>
+            </div>
+            <div class="param-desc">
+              <p>Anatomy-aware, acquisition-agnostic joint registration network. It performs <strong>rigid + non-rigid volumetric registration in under a minute</strong>, projecting BOLD data to <code>MNI152NLin6Asym</code>. Critically, its training set includes <strong>infant scans (Boston Children's Hospital)</strong>, so it normalizes developing brains robustly — the key to OmniPrep's lifespan coverage.</p>
+            </div>
+          </div>
+        </section>
+
+      </article>
+    </div>
+
+</Layout>

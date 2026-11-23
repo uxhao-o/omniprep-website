@@ -1,0 +1,185 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
+---
+<Layout lang="zh" title="处理流程与深度学习模型 — OmniPrep" description="OmniPrep — 统一多模态 MRI 预处理与分析流程。" active="docs">
+
+    <section class="page-hero">
+      <div class="container">
+        <div class="breadcrumb"><a href={`${baseUrl}/zh/`}>首页</a><span class="sep">/</span><a href={`${baseUrl}/zh/docs/`}>文档</a><span class="sep">/</span>处理流程</div>
+        <h1>处理流程</h1>
+        <p class="lead">OmniPrep 如何预处理结构像、功能像与弥散像，以及加速最耗时环节的深度学习模型。</p>
+      </div>
+    </section>
+
+    <div class="docs-layout container">
+      <aside class="toc">
+        <div class="toc-title">本页目录</div>
+        <ul>
+          <li><a class="level-1" href="#pipeline">处理流程</a></li>
+          <li><a href="#pipeline-smri">结构像（T1w）</a></li>
+          <li><a href="#pipeline-fmri">功能像（BOLD）</a></li>
+          <li><a href="#pipeline-dmri">弥散像（dMRI）</a></li>
+          <li><a class="level-1" href="#deep-learning-models">深度学习模型</a></li>
+        </ul>
+      </aside>
+
+      <article class="doc-content">
+
+        <section id="pipeline">
+          <h2>处理流程</h2>
+          <p class="lead-copy">OmniPrep 以统一工作流预处理结构像与功能像，并在此基础上额外提供「分析就绪」衍生输出（图谱级形态学、ROI 时间序列、功能/结构连接组）。深度学习步骤替代了传统最耗时的环节，其余步骤与 FreeSurfer / fMRIPrep 保持一致，确保可靠性。</p>
+
+          <h3 id="pipeline-smri">结构像（T1w）</h3>
+          <p>流程遵循 FreeSurfer v8.2.0 的 <code>recon-all</code> 序列，用三个深度学习步骤替代其中最耗时的环节。具体步骤按顺序如下：</p>
+          <ol class="steps">
+            <li>
+              <h4>头动校正</h4>
+              <p>若同一会话存在多张 T1w 扫描，使用 <code>recon-all -motioncor</code> 进行跨扫描头动校正，并平均为一张头动影响最小的 T1w 图像。</p>
+            </li>
+            <li>
+              <h4>体素级脑区分割 <span class="pill hl">深度学习</span></h4>
+              <p><strong>FastSurferCNN</strong> 将全脑分割为皮层与皮层下脑区，替代 FreeSurfer 中最耗时的体素级分割步骤。</p>
+            </li>
+            <li>
+              <h4>N4 偏场校正</h4>
+              <p>基于分割结果生成的脑掩膜，用 N4（SimpleITK）进行强度归一化。</p>
+            </li>
+            <li>
+              <h4>Talairach 坐标转换、颅骨剥离与标准化</h4>
+              <p>FreeSurfer 常规步骤：Talairach 坐标转换、基于分割掩膜的稳健颅骨剥离，以及强度标准化。</p>
+            </li>
+            <li>
+              <h4>皮层表面重建 <span class="pill hl">深度学习</span></h4>
+              <p><strong>FastCSR</strong>（拓扑保持的表面提取）重建白质与软脑膜表面，随后进行白质填充与皮层下标记。</p>
+            </li>
+            <li>
+              <h4>表面膨胀与球化</h4>
+              <p><code>mris_sphere</code> 将表面膨胀并投影为畸变最小的球面。</p>
+            </li>
+            <li>
+              <h4>皮层表面配准 <span class="pill hl">深度学习</span></h4>
+              <p><strong>SUGAR</strong> 进行刚性与非刚性球面配准，将个体表面对齐到 <code>fsaverage</code> 模板，仅需数秒（同时计算雅可比矩阵用于形态学）。</p>
+            </li>
+            <li>
+              <h4>皮层分区与形态学估计</h4>
+              <p><code>recon-all -cortparc</code> 完成皮层标记，<code>mri_surf2volseg</code> 将标记回投到体素空间；厚度 / 面积 / 体积与统计量遵循 FreeSurfer 约定。</p>
+            </li>
+          </ol>
+          <p class="xref"><strong>相关：</strong>用 <a href={`${baseUrl}/zh/docs/reference/#atlas-options`}><code>--cortex-atlas</code> / <code>--subcortex-atlas</code> / <code>--cerebellum-atlas</code> 选择分区图谱 ↗</a> · 查看保存到 <a href={`${baseUrl}/zh/docs/outputs/#outputs-recon`}>Recon/ 的结果 ↗</a></p>
+
+          <h3 id="pipeline-fmri">功能像（BOLD）</h3>
+          <ol class="steps">
+            <li>
+              <h4>头动校正与时间层校正</h4>
+              <p>用 <strong>MCFLIRT</strong>（FSL）估计头动参数，默认以中间帧为参考；当 BIDS 元数据含 slice timing 时，用 <strong>3dTshift</strong>（AFNI）做时间层校正（可选）。</p>
+            </li>
+            <li>
+              <h4>磁化率畸变校正（可选）</h4>
+              <p><strong>SDCFlows</strong> 估计 B0 场不均匀性并对畸变进行校正，需提供 fieldmap 数据时启用。</p>
+            </li>
+            <li>
+              <h4>功能-结构配准</h4>
+              <p>使用 FreeSurfer 的 <strong>边界驱动配准（BBR）</strong>，将头动校正后的 BOLD 刚性配准到个体 T1w，优化灰白质边界对齐。</p>
+            </li>
+            <li>
+              <h4>空间标准化 <span class="pill hl">深度学习</span></h4>
+              <p><strong>SynthMorph</strong> 在 1 分钟内完成刚性与非刚性体素配准；<strong>SUGAR</strong> 负责皮层表面配准。BOLD 默认投射到 <code>MNI152NLin6Asym</code> 与 <code>fsaverage6</code>（支持其他 TemplateFlow 空间）。</p>
+            </li>
+            <li>
+              <h4>去噪与回归协变量（可选）</h4>
+              <p>去除噪声回归（头动参数、白质/脑脊液信号等）、头动 scrubbing 与带通滤波，由<a href={`${baseUrl}/zh/docs/reference/#bold-denoise`}>去噪选项</a>控制。</p>
+            </li>
+            <li>
+              <h4>分析就绪衍生数据（OmniPrep 特有）</h4>
+              <p>提取 ROI 时间序列、局部指标（ReHo / ALFF / fALFF）以及 ROI 功能连接，输出为 CIFTI/NIfTI 与表格形式。</p>
+            </li>
+          </ol>
+          <p class="xref"><strong>相关：</strong>完整 BOLD 参数见 <a href={`${baseUrl}/zh/docs/reference/#bold-options`}>BOLD fMRI 参数 ↗</a> · 查看保存到 <a href={`${baseUrl}/zh/docs/outputs/#outputs-bold`}>BOLD/ 的结果 ↗</a></p>
+
+          <h3 id="pipeline-dmri">弥散像（dMRI）</h3>
+          <ol class="steps">
+            <li>
+              <h4>去噪与畸变校正 <span class="pill hl">深度学习</span></h4>
+              <p>dMRI 去噪、涡流/头动校正，以及 B0 场畸变校正（基于 fieldmap 或 <code>--dwi-sdc-method</code> 策略），通过深度学习去噪与畸变校正加速。</p>
+            </li>
+            <li>
+              <h4>张量与纤维方向建模</h4>
+              <p>计算 DTI 指标（FA / MD / AD / RD）与约束球面反卷积（CSD）纤维方向分布。</p>
+            </li>
+            <li>
+              <h4>纤维追踪</h4>
+              <p>确定性及概率性（iFOD1 / iFOD2）全脑纤维追踪，支持 SIFT2 过滤。</p>
+            </li>
+            <li>
+              <h4>分析就绪衍生数据</h4>
+              <p>结构连接组（按纤维数 / FA 加权，可选逆节点体积缩放），以及图谱级 DWI 特征。</p>
+            </li>
+          </ol>
+          <p class="xref"><strong>相关：</strong>完整 DWI 参数见 <a href={`${baseUrl}/zh/docs/reference/#dwi-options`}>DWI 参数 ↗</a> · 查看保存到 <a href={`${baseUrl}/zh/docs/outputs/#outputs-dwi`}>DWI/ 的结果 ↗</a></p>
+          <div class="callout note">
+            <svg class="ci" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            <p>对于<strong>婴幼儿与儿童队列</strong>，同样的深度学习流程同样适用：根据 <code>--age-group</code> 自动选择适龄模板（<code>MNIInfant</code> / <code>MNIPediatric</code>），而训练数据中即包含婴儿影像的 <strong>SynthMorph</strong> 则负责这些发育中大脑的体素级空间标准化。</p>
+          </div>
+        </section>
+
+        <section id="deep-learning-models">
+          <h2>深度学习模型</h2>
+          <p class="lead-copy">OmniPrep 采用四个深度学习模块，替代最耗时的传统环节，其余步骤仍保持 FreeSurfer / fMRIPrep 的可靠性。以下逐一介绍每个模型。</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>模型</th><th>替代的传统步骤</th><th>应用场景</th><th>处理速度</th></tr></thead>
+              <tbody>
+                <tr><td><strong>FastSurferCNN</strong></td><td>体素级脑区分割</td><td>结构像（T1w）</td><td>约 1 分钟</td></tr>
+                <tr><td><strong>FastCSR</strong></td><td>皮层表面重建</td><td>结构像（T1w）</td><td>—</td></tr>
+                <tr><td><strong>SUGAR</strong></td><td>皮层表面配准</td><td>结构像 + BOLD 表面</td><td>数秒</td></tr>
+                <tr><td><strong>SynthMorph</strong></td><td>体素级空间标准化</td><td>BOLD + 婴幼儿队列</td><td>&lt; 1 分钟</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="param">
+            <div class="param-head">
+              <span class="param-name">FastSurferCNN — 体素级脑区分割</span>
+              <span class="badge badge-type">结构像</span>
+            </div>
+            <div class="param-desc">
+              <p>深度学习架构，通过多切片信息聚合将全脑精准分割为 <strong>95 个皮层与皮层下结构</strong>，采用竞争性密集块与跳跃路径架构。它替代了 FreeSurfer 中最耗时的体素级步骤，约 <strong>1 分钟</strong>即可完成全脑精准分割。</p>
+            </div>
+          </div>
+
+          <div class="param">
+            <div class="param-head">
+              <span class="param-name">FastCSR — 皮层表面重建</span>
+              <span class="badge badge-type">结构像</span>
+            </div>
+            <div class="param-desc">
+              <p>基于 FastSurferCNN 的分割结果重建<strong>白质与软脑膜表面</strong>。它通过<strong>水平集（level-set）隐式表示</strong>皮层表面，并采用<strong>拓扑保持</strong>的表面提取方法生成三角网格，大幅加速表面重建。</p>
+            </div>
+          </div>
+
+          <div class="param">
+            <div class="param-head">
+              <span class="param-name">SUGAR — 皮层表面配准</span>
+              <span class="badge badge-type">结构像 + BOLD</span>
+            </div>
+            <div class="param-desc">
+              <p>球面超快图注意力框架，用于皮层表面配准。它同时执行<strong>刚性与非刚性球面配准</strong>，在<strong>数秒内</strong>将个体表面对齐到 <code>fsaverage</code> 模板，并沿途计算雅可比矩阵供形态学使用。</p>
+            </div>
+          </div>
+
+          <div class="param">
+            <div class="param-head">
+              <span class="param-name">SynthMorph — 体素级空间标准化</span>
+              <span class="badge badge-type">BOLD + 婴幼儿</span>
+            </div>
+            <div class="param-desc">
+              <p>解剖感知、采集无关的联合配准网络。它在<strong>1 分钟内</strong>完成<strong>刚性与非刚性体素配准</strong>，将 BOLD 数据投射到 <code>MNI152NLin6Asym</code>。关键之处在于：其训练集包含了<strong>婴儿影像（波士顿儿童医院）</strong>，因此能稳健地标准化发育中的大脑——这正是 OmniPrep 全生命周期覆盖能力的基础。</p>
+            </div>
+          </div>
+        </section>
+      </article>
+    </div>
+
+</Layout>

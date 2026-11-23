@@ -1,0 +1,163 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
+---
+<Layout lang="zh" title="输出与衍生数据 — OmniPrep" description="OmniPrep — 统一多模态 MRI 预处理与分析流程。" active="docs">
+
+    <section class="page-hero">
+      <div class="container">
+        <div class="breadcrumb"><a href={`${baseUrl}/zh/`}>首页</a><span class="sep">/</span><a href={`${baseUrl}/zh/docs/`}>文档</a><span class="sep">/</span>输出与衍生数据</div>
+        <h1>输出与衍生数据</h1>
+        <p class="lead">OmniPrep 在 derivatives/omniprep/ 下产出的全部内容，按模态组织——预处理结果与分析就绪衍生数据。</p>
+      </div>
+    </section>
+
+    <div class="docs-layout container">
+      <aside class="toc">
+        <div class="toc-title">本页目录</div>
+        <ul>
+          <li><a class="level-1" href="#outputs">输出与衍生数据</a></li>
+          <li><a href="#outputs-recon">结构处理结果</a></li>
+          <li><a href="#outputs-bold">功能处理结果</a></li>
+          <li><a href="#outputs-dwi">弥散处理结果</a></li>
+          <li><a href="#outputs-qc">质量控制</a></li>
+          <li><a href="#outputs-lut">图谱查找表</a></li>
+          <li><a href="#outputs-spaces">可选输出空间与格式</a></li>
+        </ul>
+      </aside>
+
+      <article class="doc-content">
+
+        <section id="outputs">
+          <h2>输出与衍生数据</h2>
+          <p class="lead-copy">所有结果统一写入 <code>&lt;output_dir&gt;/derivatives/omniprep/</code>，按模态组织，遵循 BIDS 衍生数据规范。</p>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">输出目录结构</span><button class="copy-btn">复制</button></div>
+            <pre><code>output_dir/
+└── derivatives/
+    └── omniprep/
+        ├── Recon/        # 结构：分割、表面、形态学
+        ├── BOLD/         # 去噪 BOLD + 体素/ROI 指标 + 时间序列
+        ├── DWI/          # DTI/CSD 指标、纤维追踪、连接组
+        ├── QC/           # 运行报告、trace、时间线、头动/质控图
+        ├── LUT/          # 合并后的图谱查找表（皮层 + 皮层下 + 小脑）
+        ├── WorkDir/      # Nextflow 工作目录与运行状态
+        └── dataset_description.json</code></pre>
+          </div>
+
+          <h3 id="outputs-recon">结构处理结果（Recon/）</h3>
+          <p>FreeSurfer 风格重建产生的解剖衍生数据存储在 <code>Recon/</code>，每个被试（含 session 时）一个目录：</p>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">Recon/</span><button class="copy-btn">复制</button></div>
+            <pre><code>Recon/
+├── fsaverage/            # 模板表面
+├── fsaverage6/           # 低分辨率模板表面
+└── sub-&lt;subject_label&gt;[_ses-&lt;label&gt;]/
+    ├── label/            # 皮层分区（lh./rh. + 各图谱 .annot/.ctab）
+    ├── mri/              # 标准化/去颅骨 T1w、aseg/aparc+aseg、配准结果
+    ├── surf/             # 重建的皮层表面与形态测量
+    ├── stats/            # 各图谱分区统计量
+    └── scripts/          # 处理脚本与日志</code></pre>
+          </div>
+          <p>内容遵循 FreeSurfer 约定：标准化并去颅骨的大脑；重建的皮层表面与形态测量（<code>surf/</code>）；体素级分割（<code>mri/aseg.mgz</code>）及各图谱的 <code>aparc.&lt;Atlas&gt;+aseg.mgz</code>；以及皮层表面分区（<code>label/</code>）与分区级统计量（<code>stats/</code>）。</p>
+          <p class="xref"><strong>相关：</strong>参见<a href={`${baseUrl}/zh/docs/pipeline/#pipeline-smri`}>处理流程中的结构像工作流 ↗</a> · 用<a href={`${baseUrl}/zh/docs/reference/#atlas-options`}>图谱参数 ↗</a>配置分区图谱</p>
+
+          <h3 id="outputs-bold">功能处理结果（BOLD/）</h3>
+          <p>预处理后的 BOLD 数据遵循 BIDS 衍生数据布局，每个被试包含 <code>anat/</code>、<code>func/</code> 子目录。<code>ses-&lt;label&gt;/</code> 层级仅在原始 BIDS 数据集存在 session 层级时才会出现：</p>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">BOLD/</span><button class="copy-btn">复制</button></div>
+            <pre><code>BOLD/
+└── sub-&lt;subject_label&gt;/
+    [└── ses-&lt;label&gt;/]
+        ├── anat/    # 预处理 T1w、脑掩膜、各图谱 aparcaseg dseg
+        └── func/    # 预处理 BOLD、掩膜、混淆回归、变换、ROI 指标与功能连接
+dataset_description.json</code></pre>
+          </div>
+          <p><strong>默认输出空间：</strong>（1）原始 BOLD 空间，（2）<code>MNI152NLin2009cAsym</code> 体素空间，（3）<code>fsaverage6</code> 表面空间。也可指定其他 TemplateFlow 体素/表面模板或原始 T1w 空间。</p>
+          <p><strong>主要输出包括：</strong>预处理后的 fMRI（<code>desc-preproc_bold.nii.gz</code>）；去噪变体（<code>desc-bandpassMotion24WmCsfGsr[_FWHM4/6]_bold.nii.gz</code>）；头动校正参考 volume；脑/脑室/白质掩膜；变换文件（T1w↔BOLD 参考、T1w↔标准模板）；头动参数与混淆回归变量；以及图谱级衍生数据——体素级指标图（ReHo / ALFF / fALFF / INT 及其平滑变体）、各图谱 ROI 时间序列、ROI 指标与 Pearson 功能连接矩阵（<code>desc-pearsonFC_connectivity.csv</code>）。</p>
+          <p class="xref"><strong>相关：</strong>参见<a href={`${baseUrl}/zh/docs/pipeline/#pipeline-fmri`}>处理流程中的 BOLD 工作流 ↗</a> · 完整 <a href={`${baseUrl}/zh/docs/reference/#bold-options`}>BOLD 参数 ↗</a></p>
+
+          <h3 id="outputs-dwi">弥散处理结果（DWI/）</h3>
+          <p>预处理后的 DWI 遵循 BIDS 衍生数据布局。每个被试目录下只有 <code>anat/</code> 和 <code>dwi/</code> 两个子目录（仅当原始数据集存在 session 层级时才会多一层 <code>ses-&lt;label&gt;/</code>）；所有 DWI 预处理结果及衍生结果都平铺在 <code>dwi/</code> 下，用 <code>desc-</code> 标签区分，而非子目录：</p>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">DWI/</span><button class="copy-btn">复制</button></div>
+            <pre><code>DWI/
+└── sub-&lt;subject_label&gt;/
+    [└── ses-&lt;label&gt;/]
+        ├── anat/    # 预处理 T1w、脑掩膜、各图谱 aparcaseg dseg（ACPC 空间）
+        └── dwi/     # 预处理 DWI + 全部衍生结果（平铺，按 desc- 区分）
+dataset_description.json</code></pre>
+          </div>
+          <p><strong>主要输出包括：</strong>去噪、涡流与畸变校正后的 DWI（<code>desc-preproc_dwi.nii.gz</code> + <code>.bval</code>/<code>.bvec</code>）；DTI 张量及标量图（<code>desc-dti_tensor.mif</code>、<code>desc-dti_fa/md/ad/rd/cl/cp/cs.nii.gz</code>）；CSD 白质/灰质/脑脊液 FOD（<code>desc-csd_wmfod.mif</code> 等）；五组织分割（<code>_5ttseg.mif</code>）；全脑纤维束（<code>desc-ifod2ACT5m_tractogram.tck</code>，含 SIFT2 权重）；以及各图谱结构连接组（<code>desc-ifod2ACT5mSIFT2_connectome.csv</code>、<code>...MeanFA_connectome.csv</code>、<code>..._assignments.csv</code>）。</p>
+          <p class="xref"><strong>相关：</strong>参见<a href={`${baseUrl}/zh/docs/pipeline/#pipeline-dmri`}>处理流程中的 dMRI 工作流 ↗</a> · 完整 <a href={`${baseUrl}/zh/docs/reference/#dwi-options`}>DWI 参数 ↗</a></p>
+
+          <h3 id="outputs-qc">质量控制（QC/）</h3>
+          <p>OmniPrep 为每个被试生成一份 HTML 报告，并附带运行级汇总与图示，便于快速可视化检查：</p>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">QC/</span><button class="copy-btn">复制</button></div>
+            <pre><code>QC/
+├── sub-&lt;subject_label&gt;/
+│   ├── figures/            # 各阶段图示与报告（T1w、BOLD、DWI）
+│   └── sub-&lt;subject_label&gt;.html   # 单被试报告
+├── report_&lt;timestamp&gt;.html        # 运行级报告
+├── timeline_&lt;timestamp&gt;.html      # 资源/执行时间线
+├── trace_&lt;timestamp&gt;.txt          # 执行 trace
+├── nextflow.run.command           # 实际使用的命令
+├── nextflow.run.config            # 解析后的配置
+├── QC_bold_SubjectsHeadMotion_metrics.tsv   # 组级头动指标
+├── QC_bold_SubjectsRetainedVolumes_summary.tsv
+├── QC_bold_ExcludeSubjectsAccordingToMaxHeadMotion.txt  # 按最大头动阈值建议排除的被试
+└── dataset_description.json</code></pre>
+          </div>
+
+          <h3 id="outputs-lut">图谱查找表（LUT/）</h3>
+          <p>当通过 <code>--cortex-atlas</code>、<code>--subcortex-atlas</code>、<code>--cerebellum-atlas</code> 指定了图谱时，OmniPrep 会在运行过程中<strong>动态合并</strong>这些图谱为一个不冲突的编号空间，并把合并后的查找表写入 <code>LUT/</code>：</p>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">LUT/</span><button class="copy-btn">复制</button></div>
+            <pre><code>LUT/
+├── atlas-&lt;cortex-atlas&gt;_subcortex-&lt;subcortex-atlas&gt;_cerebellum-&lt;cerebellum-atlas&gt;_desc-original_LUT.txt
+└── atlas-&lt;cortex-atlas&gt;_subcortex-&lt;subcortex-atlas&gt;_cerebellum-&lt;cerebellum-atlas&gt;_desc-ordered_LUT.txt</code></pre>
+          </div>
+          <p><code>LUT/</code> 目录<strong>只存放合并后的查找表</strong>——不会单独存放皮层 / 皮层下 / 小脑的独立 LUT 文件。每个皮层图谱会单独与皮层下、小脑图谱合并，每个皮层图谱生成一对文件：</p>
+          <ul>
+            <li><code>atlas-..._desc-original_LUT.txt</code> — 图谱拼接，保留各自的<strong>原始</strong>编号。</li>
+            <li><code>atlas-..._desc-ordered_LUT.txt</code> — 同样的区域重新映射为<strong>连续、不重叠</strong>的编号顺序，供下游指标与连接组使用。</li>
+          </ul>
+          <p>若 <code>--cortex-atlas</code> 指定了 <strong>N</strong> 个皮层图谱，则会生成 <strong>N × 2</strong> 个合并 LUT 文件（每个皮层图谱各一份 <code>desc-original</code> + <code>desc-ordered</code>）。文件名遵循 <strong>BIDS 衍生数据命名规范</strong>：<code>atlas-</code> 实体承载单个皮层图谱，<code>desc-</code> 实体区分「原始编号」与「重排序编号」。例如 <code>--cortex-atlas DK Glasser Schaefer100P7N --subcortex-atlas Brainnetome --cerebellum-atlas SUIT</code> 会生成 3 × 2 = 6 个文件：</p>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">示例</span><button class="copy-btn">复制</button></div>
+            <pre><code>atlas-DK_subcortex-Brainnetome_cerebellum-SUIT_desc-original_LUT.txt
+atlas-DK_subcortex-Brainnetome_cerebellum-SUIT_desc-ordered_LUT.txt
+atlas-Glasser_subcortex-Brainnetome_cerebellum-SUIT_desc-original_LUT.txt
+atlas-Glasser_subcortex-Brainnetome_cerebellum-SUIT_desc-ordered_LUT.txt
+atlas-Schaefer100P7N_subcortex-Brainnetome_cerebellum-SUIT_desc-original_LUT.txt
+atlas-Schaefer100P7N_subcortex-Brainnetome_cerebellum-SUIT_desc-ordered_LUT.txt</code></pre>
+          </div>
+          <div class="callout note">
+            <svg class="ci" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 16H3z"/><path d="M12 9v4M12 16h.01"/></svg>
+            <p>当<strong>不指定</strong> <code>--subcortex-atlas</code> 或 <code>--cerebellum-atlas</code> 时，对应 tag 保持字面值 <code>none</code>——例如 <code>atlas-DK_subcortex-none_cerebellum-none_desc-original_LUT.txt</code>。此时不会合并皮层下或小脑图谱。</p>
+          </div>
+          <p class="xref"><strong>相关：</strong>在<a href={`${baseUrl}/zh/docs/reference/#atlas-options`}>图谱与 ROI 参数 ↗</a>中配置三个图谱参数</p>
+
+          <h3 id="outputs-spaces">可选输出空间与格式</h3>
+          <p>除 NIfTI 外，OmniPrep 还可输出 <strong>CIFTI</strong>（融合体素与表面的致密连接组格式，排除内侧壁/白质/脑脊液）与 <strong>GIFTI</strong>（表面几何）文件。指定 <code>--bold-cifti</code> 后，结果将生成在 <code>fsLR</code> 91k 分辨率空间，与 HCP Pipelines 的 CIFTI 输出对齐，并包含脑沟深度（<code>sulc</code>）、皮层厚度（<code>thickness</code>）、曲率（<code>curv</code>）等表面指标。</p>
+
+          <div class="table-wrap">
+            <table class="summary-table">
+              <thead><tr><th>模态</th><th>预处理结果</th><th>分析就绪衍生数据</th></tr></thead>
+              <tbody>
+                <tr><td><strong>sMRI（T1w）</strong></td><td>偏场校正后的 T1w、脑掩膜、体素级分割</td><td>皮层表面、分区、ROI 形态学（厚度 / 面积 / 体积）</td></tr>
+                <tr><td><strong>fMRI（BOLD）</strong></td><td>头动与畸变校正、标准化后的 BOLD（体素 + 表面）</td><td>去噪 BOLD、ROI 时间序列、ReHo / ALFF / fALFF、ROI 功能连接</td></tr>
+                <tr><td><strong>dMRI（DWI）</strong></td><td>去噪、涡流与畸变校正后的 DWI</td><td>DTI / CSD 指标、纤维束、结构连接组</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="callout tip">
+            <svg class="ci" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <p><strong>「分析就绪」</strong>是 OmniPrep 区别于纯预处理工具的关键：输出可直接用于形态学、连接组与统计建模，无需再拼接其他工具。</p>
+          </div>
+        </section>
+      </article>
+    </div>
+
+</Layout>

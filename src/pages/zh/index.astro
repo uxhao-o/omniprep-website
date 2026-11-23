@@ -6,7 +6,7 @@ const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
 <Layout lang="zh" title="OmniPrep — 统一流程，加速大规模多模态 MRI 研究" description="OmniPrep 统一多模态 MRI 预处理与分析流程。" active="home">
 <section class="hero">
   <div class="container">
-    <span class="hero-badge"><span class="dot"></span> 多模态 · 可扩展 · 可复现</span>
+    <span class="hero-badge"><span class="dot"></span> 统一 · 多模态 · 分析就绪</span>
     <h1><span class="grad">加速</span><span class="grad-2">大规模多模态 MRI 研究</span>的统一流程</h1>
     <p class="hero-sub">
         OmniPrep 集成 sMRI、fMRI 和 dMRI 的预处理与后续分析，涵盖基于脑图谱的 ROI 特征提取及脑连接组分析，并通过深度学习与并行计算加速处理。
@@ -60,7 +60,7 @@ const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
       </div>
       <div class="card problem-card">
         <span class="tag">痛点三</span>
-        <h3>全生命周期覆盖不足</h3>
+        <h3>跨生命周期覆盖不足</h3>
         <p>成人、幼儿与婴幼儿队列的模板与失真校正策略彼此割裂，跨年龄段研究需大量人工适配；质量控制多依赖人眼判读，缺乏流程内建的自动化 QC。</p>
         <div class="solve">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
@@ -85,7 +85,7 @@ const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
     <div class="section-head">
       <span class="eyebrow">六大创新点</span>
       <h2>从数据到结论的完整链条</h2>
-      <p class="lead">统一 · 加速 · 全生命周期 · 端到端特征 · 可复现 · 零门槛</p>
+      <p class="lead">统一 · 加速 · 跨生命周期 · 端到端特征 · 可复现 · 零门槛</p>
     </div>
     <div class="grid grid-3">
       <div class="card innovation-card">
@@ -103,7 +103,7 @@ const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
       <div class="card innovation-card">
         <span class="idx">03</span>
         <span class="en">Across the Lifespan</span>
-        <h3>全生命周期覆盖</h3>
+        <h3>跨生命周期覆盖</h3>
         <p>成人、幼儿、婴幼儿队列自动判龄，匹配对应 MNI 模板与失真校正策略，一套流程覆盖全年龄段数据。</p>
       </div>
       <div class="card innovation-card">
@@ -140,6 +140,54 @@ const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
 <section class="section soft">
   <div class="container">
     <div class="section-head">
+      <span class="eyebrow">三大模态，一条流程</span>
+      <h2>端到端的多模态工作流</h2>
+      <p class="lead">用 <code style="font-family:var(--font-mono)">--tasks</code> 标志启用你需要的任务——模态间的依赖会自动处理。</p>
+    </div>
+    <div class="modality">
+      <div class="modality-card anat">
+        <span class="modality-badge">anat</span>
+        <h3>结构像（sMRI）</h3>
+        <div class="sub">T1w 预处理与重建</div>
+        <p>基于 FreeSurfer 的皮层重建与分割，产出表面、分区以及图集级形态学特征。</p>
+        <ul>
+          <li>FreeSurfer 重建</li>
+          <li>ROI 级形态学</li>
+          <li>Native 与 MNI 空间表面</li>
+        </ul>
+        <a class="more" href={`${baseUrl}/zh/docs/reference/#general-options`}>了解更多 ↗</a>
+      </div>
+      <div class="modality-card bold">
+        <span class="modality-badge">bold</span>
+        <h3>功能像（fMRI）</h3>
+        <div class="sub">BOLD 预处理与衍生数据</div>
+        <p>完整的 BOLD 去噪链，包含头动清洗、干扰回归、时间滤波，以及丰富的体素级与 ROI 级指标。</p>
+        <ul>
+          <li>ReHo、ALFF/fALFF、INT</li>
+          <li>ROI 时间序列与功能连接矩阵</li>
+          <li>CIFTI 与表面输出</li>
+        </ul>
+        <a class="more" href={`${baseUrl}/zh/docs/reference/#bold-options`}>了解更多 ↗</a>
+      </div>
+      <div class="modality-card dwi">
+        <span class="modality-badge">dwi</span>
+        <h3>弥散像（dMRI）</h3>
+        <div class="sub">DWI 预处理、纤维追踪与连接组</div>
+        <p>畸变校正、DTI 与 CSD 指标、全脑纤维追踪（iFOD2、SD-Stream、tensor），以及结构连接组。</p>
+        <ul>
+          <li>DTI 与 CSD 指标</li>
+          <li>全脑纤维追踪</li>
+          <li>结构连接组</li>
+        </ul>
+        <a class="more" href={`${baseUrl}/zh/docs/reference/#dwi-options`}>了解更多 ↗</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head">
       <span class="eyebrow">快速开始</span>
       <h2>三步运行</h2>
       <p class="lead">从原始 BIDS 数据到衍生数据，几分钟完成。</p>
@@ -174,18 +222,32 @@ const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
           <h3 style="display:flex;align-items:center;gap:9px">产出内容</h3>
           <p>OmniPrep 将结果写入 <code style="font-family:var(--font-mono)">output_dir/derivatives/omniprep</code>：</p>
           <div class="pill-row">
-            <span class="pill hl">Recon/</span><span class="pill hl">BOLD/</span><span class="pill hl">DWI/</span><span class="pill hl">QC/</span>
+            <span class="pill hl">Recon/</span><span class="pill hl">BOLD/</span><span class="pill hl">DWI/</span><span class="pill hl">QC/</span><span class="pill hl">LUT/</span>
             <span class="pill">report.html</span><span class="pill">timeline.html</span>
           </div>
           <ul style="margin-top:16px;padding-left:20px;color:var(--muted);font-size:.93rem">
-            <li>FreeSurfer 重建与形态学</li>
-            <li>去噪 BOLD + 体素/ROI 指标</li>
-            <li>纤维追踪与连接组</li>
+            <li>皮层重建 / 体积重建与形态学特征</li>
+            <li>去噪 BOLD + 体素/ROI 指标与功能连接组（FC）</li>
+            <li>DTI指标 + 纤维追踪与结构连接组（SC）</li>
             <li>自动化 QC 报告</li>
+            <li>按最大头动阈值建议排除被试的文件</li>
           </ul>
-          <a class="btn btn-primary" style="margin-top:16px" href={`${baseUrl}/zh/getting-started/`}>查看完整指南 →</a>
+          <a class="btn btn-primary" style="margin-top:16px" href={`${baseUrl}/zh/getting-started/`}>查看完整指南 ↗</a>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<section class="section soft">
+  <div class="container" style="text-align:center;max-width:720px">
+    <h2>准备好大规模分析了吗？</h2>
+    <p class="lead" style="color:var(--muted);margin-bottom:28px">
+      阅读文档探索每个选项，或直接开始安装。
+    </p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href={`${baseUrl}/zh/docs/`}>浏览文档</a>
+      <a class="btn btn-ghost" href={`${baseUrl}/zh/about/`}>关于项目</a>
     </div>
   </div>
 </section>

@@ -125,21 +125,39 @@
   });
 
   // Restore position after the language switch.
+  // The target element may not be at its final layout position until fonts,
+  // images and code blocks have loaded, so re-settle the scroll until the
+  // element's offsetTop stops moving (a single rAF is not enough).
   try {
     var saved = sessionStorage.getItem(KEY);
     if (saved) {
       sessionStorage.removeItem(KEY);
       var p = JSON.parse(saved);
-      var target = null;
-      if (p.hash) target = document.getElementById(p.hash);
-      if (target) {
-        // Defer so layout (fonts, images) settles; header offset ~ 110px.
-        requestAnimationFrame(function () {
-          var top = target.getBoundingClientRect().top + window.scrollY - 110;
-          window.scrollTo(0, Math.max(0, top));
-        });
-      } else if (!location.hash && p.y > 0) {
-        requestAnimationFrame(function () { window.scrollTo(0, p.y); });
+      var anchorId = p.hash;
+      if (location.hash) anchorId = location.hash.slice(1);
+
+      function settleScroll() {
+        var target = anchorId ? document.getElementById(anchorId) : null;
+        if (!target) {
+          if (p.y > 0) window.scrollTo(0, p.y);
+          return;
+        }
+        var top = target.getBoundingClientRect().top + window.scrollY - 96;
+        window.scrollTo(0, Math.max(0, top));
+      }
+
+      var attempts = 0;
+      function settleLoop() {
+        settleScroll();
+        // Keep correcting a few more frames while layout stabilises.
+        if (attempts++ < 10) requestAnimationFrame(settleLoop);
+      }
+      requestAnimationFrame(settleLoop);
+      // One final pass after full page load (images/fonts resolved).
+      if (document.readyState === 'complete') {
+        setTimeout(settleScroll, 250);
+      } else {
+        window.addEventListener('load', function () { setTimeout(settleScroll, 250); });
       }
     }
   } catch (err) { /* ignore */ }

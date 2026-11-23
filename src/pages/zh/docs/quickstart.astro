@@ -1,0 +1,176 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
+---
+<Layout lang="zh" title="快速上手 — OmniPrep" description="OmniPrep — 统一多模态 MRI 预处理与分析流程。" active="docs">
+
+    <section class="page-hero">
+      <div class="container">
+        <div class="breadcrumb"><a href={`${baseUrl}/zh/`}>首页</a><span class="sep">/</span><a href={`${baseUrl}/zh/docs/`}>文档</a><span class="sep">/</span>快速上手</div>
+        <h1>快速上手</h1>
+        <p class="lead">几分钟内运行 OmniPrep——运行前准备、三种运行命令，以及常见研究设计的一键配置模板。</p>
+      </div>
+    </section>
+
+    <div class="docs-layout container">
+      <aside class="toc">
+        <div class="toc-title">本页目录</div>
+        <ul>
+          <li><a class="level-1" href="#quickstart">快速上手</a></li>
+          <li><a href="#prereq">运行前准备</a></li>
+          <li><a href="#run-cmd">运行命令</a></li>
+          <li><a href="#positional">位置参数</a></li>
+          <li><a class="level-1" href="#recipes">场景配置模板</a></li>
+        </ul>
+      </aside>
+
+      <article class="doc-content">
+
+        <section id="quickstart">
+          <h2>快速上手</h2>
+          <p class="lead-copy">OmniPrep 严格遵循 BIDS App 参数规范，所有衍生结果统一写入 <code>&lt;output_dir&gt;/derivatives/omniprep/</code> 目录。</p>
+
+          <div class="callout warn">
+            <svg class="ci" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <p><strong>需要查找某个具体参数？</strong>本页仅介绍最基础的内容。完整的命令行参数清单——必需参数、通用参数、图谱参数、BOLD 与 DWI 参数（含默认值与示例）——请参见 <a href={`${baseUrl}/zh/docs/reference/`}><strong>完整参数参考 ↗</strong></a></p>
+          </div>
+
+          <h3 id="prereq">运行前准备</h3>
+          <p>开始运行 OmniPrep 之前，只需准备以下三项内容：</p>
+          <ul>
+            <li><strong>BIDS 格式数据目录：</strong>原始影像需按 BIDS 规范组织；若涉及儿童或婴幼儿队列，建议在 <code>sessions.tsv</code> 或 <code>participants.tsv</code> 中提供年龄列（支持 <code>age_days</code>、<code>age_weeks</code>、<code>age_months</code> 或 <code>age</code>）。</li>
+            <li><strong>FreeSurfer 许可证文件：</strong>可前往 <a href="https://surfer.nmr.mgh.harvard.edu/registration.html" target="_blank" rel="noopener">FreeSurfer 官网 ↗</a> 免费注册获取 <code>license.txt</code>。</li>
+            <li><strong>容器运行环境：</strong>单机/工作站推荐使用 Docker（配备 NVIDIA GPU 时需安装 NVIDIA Container Toolkit）；高性能计算集群（HPC）推荐使用 Singularity + SLURM。</li>
+          </ul>
+
+          <h3 id="run-cmd">运行命令</h3>
+          <p><strong>方式 A — Docker</strong>（单机工作站 / 服务器推荐）：</p>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">bash</span><button class="copy-btn">复制</button></div>
+            <pre><code>docker run -it --rm --gpus all \
+  -v /path/to/bids:/data:ro \
+  -v /path/to/output:/out \
+  -v /path/to/license.txt:/license.txt:ro \
+  uxhao/omniprep:latest /data /out participant \
+  --fs-license-file /license.txt \
+  --tasks anat bold dwi</code></pre>
+          </div>
+          <p><strong>方式 B — Singularity</strong>（单节点运行）：</p>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">bash</span><button class="copy-btn">复制</button></div>
+            <pre><code>singularity run --nv \
+  --bind /path/to/bids:/data \
+  --bind /path/to/output:/out \
+  --bind /path/to/license.txt:/license.txt \
+  /path/to/omniprep.simg /data /out participant \
+  --fs-license-file /license.txt \
+  --tasks anat bold dwi</code></pre>
+          </div>
+          <p><strong>方式 C — Singularity + SLURM</strong>（HPC 集群推荐，封装脚本自动分发任务）：</p>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">bash</span><button class="copy-btn">复制</button></div>
+            <pre><code>sbatch omniprep_singularity.sh \
+  /path/to/omniprep.simg \
+  /path/to/bids \
+  /path/to/output \
+  participant \
+  --fs-license-file /path/to/license.txt \
+  --tasks anat bold dwi \
+  --clean-workdir</code></pre>
+          </div>
+
+          <h3 id="positional">固定位置参数说明</h3>
+          <p>按以下顺序直接填写，前面不加任何参数名称：</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>顺序</th><th>参数名</th><th>说明</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td><code>bids_dir</code></td><td>BIDS 原始数据集根目录路径。</td></tr>
+                <tr><td>2</td><td><code>output_dir</code></td><td>输出根目录路径，实际衍生结果位于 <code>&lt;output_dir&gt;/derivatives/omniprep/</code>。</td></tr>
+                <tr><td>3</td><td><code>participant</code></td><td>BIDS App 分析级别，固定填写 <code>participant</code>。</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p><strong>HPC 说明：</strong>SLURM 包装脚本（<code>omniprep_singularity.sh</code>）需在最前面额外多传一个参数——宿主机上的 Singularity 镜像路径（<code>.simg</code> / <code>.sif</code>），即 <code>image_path bids_dir output_dir participant</code>。</p>
+
+          <h3>参数书写规则与自动依赖机制</h3>
+          <ul>
+            <li><strong>多值参数使用空格分隔：</strong>例如 <code>--tasks anat bold dwi</code>、<code>--cortex-atlas DK Schaefer200P7N</code>。</li>
+            <li><strong>布尔参数：提供即启用。</strong>如 <code>--clean-workdir</code>、<code>--bold-denoise</code>、<code>--no-qc</code> 这类布尔参数，默认不启用；在命令行中提供该参数即表示启用，不提供则不启用。</li>
+            <li><strong>下游参数自动激活上游依赖：</strong>无需手动堆砌所有前置步骤。指定 <code>--bold-roi-pearson-fc</code> 时会自动开启 <code>--bold-roi-timeseries</code>、<code>--bold-denoise</code> 与 <code>--bold-confounds</code>；指定 <code>--dwi-fa-connectome</code> 时会自动开启 <code>--dwi-cal-dti</code>、<code>--dwi-create-connectome</code>、<code>--dwi-fiber-track</code> 与 <code>--dwi-cal-csd</code>。</li>
+          </ul>
+        </section>
+
+        <section id="recipes">
+          <h2>常见场景一键配置模板</h2>
+          <p class="lead-copy">如果不确定如何组合参数，可直接复制与你研究最接近的模板，替换本地数据路径后即可启动。</p>
+
+          <h3>场景 1 — 成人多模态全套预处理（皮层+皮层下+小脑 + 功能连接 + 结构连接组）</h3>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">bash</span><button class="copy-btn">复制</button></div>
+            <pre><code>docker run -it --rm --gpus all \
+  -v /path/to/bids:/data:ro \
+  -v /path/to/output:/out \
+  -v /path/to/license.txt:/license.txt:ro \
+  uxhao/omniprep:latest /data /out participant \
+  --fs-license-file /license.txt \
+  --tasks anat bold dwi \
+  --cortex-atlas DK Schaefer200P7N Glasser \
+  --subcortex-atlas TianS2 \
+  --cerebellum-atlas SUIT \
+  --bold-task-type rest \
+  --bold-scrubbing --bold-roi-pearson-fc --bold-roi-fc-fisherz \
+  --bold-metrics reho alff falff --bold-roi-metrics \
+  --dwi-fa-connectome --fiber-track-sift2 --fiber-track-select 5000000 \
+  --clean-workdir</code></pre>
+          </div>
+
+          <h3>场景 2 — 仅补跑 BOLD（复用已有结构像 Recon 目录，避免重跑 anat）</h3>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">bash</span><button class="copy-btn">复制</button></div>
+            <pre><code>docker run -it --rm --gpus all \
+  -v /path/to/bids:/data:ro \
+  -v /path/to/output:/out \
+  -v /path/to/license.txt:/license.txt:ro \
+  uxhao/omniprep:latest /data /out participant \
+  --fs-license-file /license.txt \
+  --tasks bold \
+  --subjects-dir /out/derivatives/omniprep/Recon \
+  --participant-label sub-001 sub-002 \
+  --bold-denoise-strategy acompcor6_motion24_wm_csf \
+  --bold-roi-pearson-fc</code></pre>
+          </div>
+
+          <h3>场景 3 — 婴幼儿 / 儿童发育队列预处理（自动月龄模板路由）</h3>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">bash</span><button class="copy-btn">复制</button></div>
+            <pre><code>docker run -it --rm --gpus all \
+  -v /path/to/bids:/data:ro \
+  -v /path/to/output:/out \
+  -v /path/to/license.txt:/license.txt:ro \
+  uxhao/omniprep:latest /data /out participant \
+  --fs-license-file /license.txt \
+  --age-group infant \
+  --tasks anat bold dwi \
+  --cortex-atlas DK \
+  --subcortex-atlas freesurfer \
+  --bold-output-space MNIInfant:cohort-4:res-2 \
+  --dwi-sdc-method auto \
+  --clean-workdir</code></pre>
+          </div>
+
+          <h3>场景 4 — 大队列中途中断后的断点续跑（保留原参数不变，仅追加 --resume）</h3>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">bash</span><button class="copy-btn">复制</button></div>
+            <pre><code>sbatch omniprep_singularity.sh \
+  /path/to/omniprep.simg /path/to/bids /path/to/output participant \
+  --fs-license-file /path/to/license.txt \
+  --tasks anat bold dwi \
+  --clean-workdir \
+  --resume</code></pre>
+          </div>
+        </section>
+      </article>
+    </div>
+
+</Layout>

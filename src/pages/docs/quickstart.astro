@@ -1,0 +1,177 @@
+---
+import Layout from '../../layouts/Layout.astro';
+const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
+---
+<Layout lang="en" title="Quick Start — OmniPrep" description="OmniPrep — unified multimodal MRI preprocessing and analysis pipeline." active="docs">
+
+    <section class="page-hero">
+      <div class="container">
+        <div class="breadcrumb"><a href={`${baseUrl}/`}>Home</a><span class="sep">/</span><a href={`${baseUrl}/docs/`}>Documentation</a><span class="sep">/</span>Quick start</div>
+        <h1>Quick Start</h1>
+        <p class="lead">Run OmniPrep in minutes — prerequisites, the three run commands, and ready-to-use configuration recipes for common study designs.</p>
+      </div>
+    </section>
+
+    <div class="docs-layout container">
+      <aside class="toc">
+        <div class="toc-title">On this page</div>
+        <ul>
+          <li><a class="level-1" href="#quickstart">Quick start</a></li>
+          <li><a href="#prereq">Prerequisites</a></li>
+          <li><a href="#run-cmd">Run commands</a></li>
+          <li><a href="#positional">Positional arguments</a></li>
+          <li><a class="level-1" href="#recipes">Configuration recipes</a></li>
+        </ul>
+      </aside>
+
+      <article class="doc-content">
+
+        <section id="quickstart">
+          <h2>Quick start</h2>
+          <p class="lead-copy">OmniPrep follows the BIDS App argument convention. All derivatives are written under <code>&lt;output_dir&gt;/derivatives/omniprep/</code>.</p>
+
+          <div class="callout warn">
+            <svg class="ci" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <p><strong>Need a specific option?</strong> This page covers only the essentials. For the complete list of command-line options — required, general, atlas, BOLD and DWI flags with defaults and examples — see the <a href={`${baseUrl}/docs/reference/`}><strong>full Parameter Reference ↗</strong></a></p>
+          </div>
+
+          <h3 id="prereq">Prerequisites</h3>
+          <p>Before running OmniPrep, prepare three things:</p>
+          <ul>
+            <li><strong>BIDS-formatted dataset:</strong> organize raw MRI data following the BIDS specification. For pediatric or infant cohorts, include participant ages in <code>sessions.tsv</code> (preferred) or <code>participants.tsv</code> (<code>age_days</code>, <code>age_weeks</code>, <code>age_months</code>, or <code>age</code> in years).</li>
+            <li><strong>FreeSurfer license file:</strong> obtain a free <code>license.txt</code> from the <a href="https://surfer.nmr.mgh.harvard.edu/registration.html" target="_blank" rel="noopener">FreeSurfer registration portal ↗</a>.</li>
+            <li><strong>Container runtime:</strong> Docker on single-node workstations/servers (install NVIDIA Container Toolkit for GPU acceleration), or Singularity + SLURM on HPC clusters.</li>
+          </ul>
+
+          <h3 id="run-cmd">Run commands</h3>
+          <p><strong>Option A — Docker</strong> (recommended for workstations / single servers):</p>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">bash</span><button class="copy-btn">Copy</button></div>
+            <pre><code>docker run -it --rm --gpus all \
+  -v /path/to/bids:/data:ro \
+  -v /path/to/output:/out \
+  -v /path/to/license.txt:/license.txt:ro \
+  uxhao/omniprep:latest /data /out participant \
+  --fs-license-file /license.txt \
+  --tasks anat bold dwi</code></pre>
+          </div>
+          <p><strong>Option B — Singularity</strong> (single-node execution):</p>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">bash</span><button class="copy-btn">Copy</button></div>
+            <pre><code>singularity run --nv \
+  --bind /path/to/bids:/data \
+  --bind /path/to/output:/out \
+  --bind /path/to/license.txt:/license.txt \
+  /path/to/omniprep.simg /data /out participant \
+  --fs-license-file /license.txt \
+  --tasks anat bold dwi</code></pre>
+          </div>
+          <p><strong>Option C — Singularity + SLURM</strong> (HPC clusters, via the wrapper script):</p>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">bash</span><button class="copy-btn">Copy</button></div>
+            <pre><code>sbatch omniprep_singularity.sh \
+  /path/to/omniprep.simg \
+  /path/to/bids \
+  /path/to/output \
+  participant \
+  --fs-license-file /path/to/license.txt \
+  --tasks anat bold dwi \
+  --clean-workdir</code></pre>
+          </div>
+
+          <h3 id="positional">Positional arguments</h3>
+          <p>Run in this order, with no flag in front of them:</p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Order</th><th>Argument</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td><code>bids_dir</code></td><td>Root directory of the input BIDS dataset.</td></tr>
+                <tr><td>2</td><td><code>output_dir</code></td><td>Root output directory; derivatives are saved in <code>&lt;output_dir&gt;/derivatives/omniprep/</code>.</td></tr>
+                <tr><td>3</td><td><code>participant</code></td><td>BIDS App analysis level; always <code>participant</code>.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p><strong>HPC note:</strong> the SLURM wrapper script (<code>omniprep_singularity.sh</code>) takes one extra argument first — the host path to the Singularity image (<code>.simg</code> / <code>.sif</code>), i.e. <code>image_path bids_dir output_dir participant</code>.</p>
+
+          <h3>Syntax rules &amp; automatic dependency resolution</h3>
+          <ul>
+            <li><strong>Space-separated multi-value options:</strong> separate entries with spaces (e.g. <code>--tasks anat bold dwi</code>, <code>--cortex-atlas DK Schaefer200P7N</code>).</li>
+            <li><strong>Boolean flags:</strong> flags such as <code>--clean-workdir</code>, <code>--bold-denoise</code> and <code>--no-qc</code> are disabled by default and enabled simply by specifying them.</li>
+            <li><strong>Automatic upstream activation:</strong> you do not need to list every prerequisite flag. <code>--bold-roi-pearson-fc</code> auto-enables <code>--bold-roi-timeseries</code>, <code>--bold-denoise</code> and <code>--bold-confounds</code>; <code>--dwi-fa-connectome</code> auto-enables <code>--dwi-cal-dti</code>, <code>--dwi-create-connectome</code>, <code>--dwi-fiber-track</code> and <code>--dwi-cal-csd</code>.</li>
+          </ul>
+        </section>
+
+        <section id="recipes">
+          <h2>Ready-to-use configuration recipes</h2>
+          <p class="lead-copy">Copy the template closest to your study design and replace the host paths to launch immediately.</p>
+
+          <h3>Recipe 1 — Full adult multimodal pipeline (3-layer atlas + functional &amp; structural connectomes)</h3>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">bash</span><button class="copy-btn">Copy</button></div>
+            <pre><code>docker run -it --rm --gpus all \
+  -v /path/to/bids:/data:ro \
+  -v /path/to/output:/out \
+  -v /path/to/license.txt:/license.txt:ro \
+  uxhao/omniprep:latest /data /out participant \
+  --fs-license-file /license.txt \
+  --tasks anat bold dwi \
+  --cortex-atlas DK Schaefer200P7N Glasser \
+  --subcortex-atlas TianS2 \
+  --cerebellum-atlas SUIT \
+  --bold-task-type rest \
+  --bold-scrubbing --bold-roi-pearson-fc --bold-roi-fc-fisherz \
+  --bold-metrics reho alff falff --bold-roi-metrics \
+  --dwi-fa-connectome --fiber-track-sift2 --fiber-track-select 5000000 \
+  --clean-workdir</code></pre>
+          </div>
+
+          <h3>Recipe 2 — BOLD-only re-run reusing existing structural derivatives</h3>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">bash</span><button class="copy-btn">Copy</button></div>
+            <pre><code>docker run -it --rm --gpus all \
+  -v /path/to/bids:/data:ro \
+  -v /path/to/output:/out \
+  -v /path/to/license.txt:/license.txt:ro \
+  uxhao/omniprep:latest /data /out participant \
+  --fs-license-file /license.txt \
+  --tasks bold \
+  --subjects-dir /out/derivatives/omniprep/Recon \
+  --participant-label sub-001 sub-002 \
+  --bold-denoise-strategy acompcor6_motion24_wm_csf \
+  --bold-roi-pearson-fc</code></pre>
+          </div>
+
+          <h3>Recipe 3 — Infant / pediatric developmental cohort (automatic age-matched routing)</h3>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">bash</span><button class="copy-btn">Copy</button></div>
+            <pre><code>docker run -it --rm --gpus all \
+  -v /path/to/bids:/data:ro \
+  -v /path/to/output:/out \
+  -v /path/to/license.txt:/license.txt:ro \
+  uxhao/omniprep:latest /data /out participant \
+  --fs-license-file /license.txt \
+  --age-group infant \
+  --tasks anat bold dwi \
+  --cortex-atlas DK \
+  --subcortex-atlas freesurfer \
+  --bold-output-space MNIInfant:cohort-4:res-2 \
+  --dwi-sdc-method auto \
+  --clean-workdir</code></pre>
+          </div>
+
+          <h3>Recipe 4 — Resuming an interrupted large-scale HPC cohort</h3>
+          <div class="code-block">
+            <div class="cb-head"><span class="cb-label">bash</span><button class="copy-btn">Copy</button></div>
+            <pre><code>sbatch omniprep_singularity.sh \
+  /path/to/omniprep.simg /path/to/bids /path/to/output participant \
+  --fs-license-file /path/to/license.txt \
+  --tasks anat bold dwi \
+  --clean-workdir \
+  --resume</code></pre>
+          </div>
+        </section>
+
+      </article>
+    </div>
+
+</Layout>
