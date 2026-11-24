@@ -30,7 +30,7 @@ const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
 
         <section id="outputs">
           <h2>输出与衍生数据</h2>
-          <p class="lead-copy">所有结果统一写入 <code>&lt;output_dir&gt;/derivatives/omniprep/</code>，按模态组织，遵循 BIDS 衍生数据规范。</p>
+          <p class="lead-copy">所有结果统一写入 <code>&lt;output_dir&gt;/derivatives/omniprep/</code>，按模态组织，遵循 <a href="https://bids.neuroimaging.io/" target="_blank" rel="noopener">Brain Imaging Data Structure（BIDS）</a> 衍生数据规范。</p>
           <div class="code-block">
             <div class="cb-head"><span class="cb-label">输出目录结构</span><button class="copy-btn">复制</button></div>
             <pre><code>output_dir/
@@ -157,6 +157,23 @@ atlas-Schaefer100P7N_subcortex-Brainnetome_cerebellum-SUIT_desc-ordered_LUT.txt<
             <p><strong>「分析就绪」</strong>是 OmniPrep 区别于纯预处理工具的关键：输出可直接用于形态学、连接组与统计建模，无需再拼接其他工具。</p>
           </div>
         </section>
+
+        <nav class="doc-pagination">
+          <a class="pager prev" href={`${baseUrl}/zh/docs/pipeline/`}>
+            <span class="pager-arrow">←</span>
+            <span class="pager-text">
+              <span class="pager-label">上一页</span>
+              <span class="pager-title">处理流程</span>
+            </span>
+          </a>
+          <a class="pager next" href={`${baseUrl}/zh/docs/reference/`}>
+            <span class="pager-text">
+              <span class="pager-label">下一页</span>
+              <span class="pager-title">参数参考</span>
+            </span>
+            <span class="pager-arrow">→</span>
+          </a>
+        </nav>
       </article>
     </div>
 

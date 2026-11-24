@@ -711,6 +711,56 @@ a.doc-card .card-icon { pointer-events: none; }
 
 .lead-copy { color: var(--muted); font-size: 1.05rem; }
 
+/* Doc pagination (prev / next module navigation) — BIDS-style dark bar */
+.doc-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  margin-top: 56px;
+  background: linear-gradient(100deg, var(--navy-deep), var(--blue));
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.doc-pagination .pager {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 26px;
+  text-decoration: none;
+  color: #fff;
+  flex: 1 1 auto;
+  transition: background .15s ease;
+}
+.doc-pagination .pager:hover { background: rgba(255, 255, 255, .08); }
+.doc-pagination .pager.prev { justify-content: flex-start; text-align: left; }
+.doc-pagination .pager.next { justify-content: flex-end; text-align: right; }
+.doc-pagination .pager .pager-arrow {
+  font-size: 1.5rem;
+  line-height: 1;
+  color: #7fd4e0;
+  flex: 0 0 auto;
+}
+.doc-pagination .pager.next .pager-arrow { color: #7fd4e0; }
+.doc-pagination .pager .pager-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.doc-pagination .pager .pager-label {
+  font-size: .74rem;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: rgba(255, 255, 255, .62);
+}
+.doc-pagination .pager .pager-title {
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: #fff;
+}
+.doc-pagination .pager.next .pager-text { align-items: flex-end; }
+
+
+
 /* Cross-reference footer under pipeline steps / section summaries */
 .xref {
   margin: 18px 0;

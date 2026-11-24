@@ -30,7 +30,7 @@ const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
 
         <section id="outputs">
           <h2>Outputs &amp; derivatives</h2>
-          <p class="lead-copy">Everything is written under <code>&lt;output_dir&gt;/derivatives/omniprep/</code>, organized by modality, and follows BIDS derivatives conventions.</p>
+          <p class="lead-copy">Everything is written under <code>&lt;output_dir&gt;/derivatives/omniprep/</code>, organized by modality, and follows <a href="https://bids.neuroimaging.io/" target="_blank" rel="noopener">Brain Imaging Data Structure (BIDS)</a> derivatives conventions.</p>
           <div class="code-block">
             <div class="cb-head"><span class="cb-label">output tree</span><button class="copy-btn">Copy</button></div>
             <pre><code>output_dir/
@@ -157,6 +157,23 @@ atlas-Schaefer100P7N_subcortex-Brainnetome_cerebellum-SUIT_desc-ordered_LUT.txt<
             <p>The <strong>analysis-ready</strong> layer is what sets OmniPrep apart from a pure preprocessing pipeline: the output feeds directly into morphometry, connectomics, and statistical modeling without extra tooling.</p>
           </div>
         </section>
+
+        <nav class="doc-pagination">
+          <a class="pager prev" href={`${baseUrl}/docs/pipeline/`}>
+            <span class="pager-arrow">←</span>
+            <span class="pager-text">
+              <span class="pager-label">Previous</span>
+              <span class="pager-title">Processing Pipeline</span>
+            </span>
+          </a>
+          <a class="pager next" href={`${baseUrl}/docs/reference/`}>
+            <span class="pager-text">
+              <span class="pager-label">Next</span>
+              <span class="pager-title">Parameter Reference</span>
+            </span>
+            <span class="pager-arrow">→</span>
+          </a>
+        </nav>
 
       </article>
     </div>

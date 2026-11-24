@@ -72,7 +72,7 @@ const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
           <ol class="steps">
             <li>
               <h4>头动校正与时间层校正</h4>
-              <p>用 <strong>MCFLIRT</strong>（FSL）估计头动参数，默认以中间帧为参考；当 BIDS 元数据含 slice timing 时，用 <strong>3dTshift</strong>（AFNI）做时间层校正（可选）。</p>
+              <p>用 <strong>MCFLIRT</strong>（FSL）估计头动参数，默认以中间帧为参考；当 <a href="https://bids.neuroimaging.io/" target="_blank" rel="noopener">Brain Imaging Data Structure（BIDS）</a> 元数据含 slice timing 时，用 <strong>3dTshift</strong>（AFNI）做时间层校正（可选）。</p>
             </li>
             <li>
               <h4>磁化率畸变校正（可选）</h4>
@@ -179,6 +179,23 @@ const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
             </div>
           </div>
         </section>
+
+        <nav class="doc-pagination">
+          <a class="pager prev" href={`${baseUrl}/zh/docs/quickstart/`}>
+            <span class="pager-arrow">←</span>
+            <span class="pager-text">
+              <span class="pager-label">上一页</span>
+              <span class="pager-title">快速上手</span>
+            </span>
+          </a>
+          <a class="pager next" href={`${baseUrl}/zh/docs/outputs/`}>
+            <span class="pager-text">
+              <span class="pager-label">下一页</span>
+              <span class="pager-title">输出与衍生数据</span>
+            </span>
+            <span class="pager-arrow">→</span>
+          </a>
+        </nav>
       </article>
     </div>
 
