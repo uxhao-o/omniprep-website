@@ -40,7 +40,8 @@ const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
               </p>
           </section>
 
-<h2 id="principles">设计原则</h2>
+<section id="principles">
+<h2>设计原则</h2>
 <div class="grid grid-2">
             <div class="card">
               <div class="card-icon blue">
@@ -71,7 +72,9 @@ const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
               <p>容器化依赖、BIDS 输入、标准化衍生数据、版本化 QC 产物。</p>
             </div>
           </div>
-<h2 id="roadmap">路线图</h2>
+</section>
+<section id="roadmap">
+<h2>路线图</h2>
 <table>
 <thead>
 <tr>
@@ -93,8 +96,9 @@ const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
 <td><span class="badge badge-flag">进行中</span></td>
 </tr>
 <tr>
-<td>交互式 Web 界面（Streamlit）</td>
-<td><span class="badge badge-default">计划中</span></td>
+<td>桌面 GUI 应用</td>
+<td><span class="badge badge-flag">进行中</span></td>
+<td>跨平台桌面应用，用于配置并启动流程。</td>
 </tr>
 <tr>
 <td>扩展图集目录</td>
@@ -106,7 +110,9 @@ const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
 </tr>
 </tbody>
 </table>
-<h2 id="citation">引用</h2>
+</section>
+<section id="citation">
+<h2>引用</h2>
 <p>如果你在研究中使用 OmniPrep，请引用本项目（及其所依赖的上游工具）。正式引用将在论文发表后补充。</p>
 <pre><code class="language-bibtex">@software&#123;omniprep,
   title   = &#123;OmniPrep: A Unified Pipeline for Accelerating Large-Scale Multimodal MRI Research&#125;,
@@ -115,7 +121,9 @@ const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
   url     = &#123;{codeRepoUrl}&#125;
 &#125;
 </code></pre>
-<h2 id="acknowledgements">致谢</h2>
+</section>
+<section id="acknowledgements">
+<h2>致谢</h2>
 <p>OmniPrep 基于并深深受益于开放神经影像社区。关键依赖与灵感来源包括：</p>
 <ul>
 <li><a href="https://surfer.nmr.mgh.harvard.edu/">FreeSurfer</a> — 皮层重建与分割</li>
@@ -125,10 +133,15 @@ const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
 <li><a href="https://bids.neuroimaging.io/">BIDS</a> — OmniPrep 消费并遵循的数据标准</li>
 <li>Power 等人 — 头动帧检测方法学</li>
 </ul>
-<h2 id="contributing">贡献</h2>
+</section>
+<section id="contributing">
+<h2>贡献</h2>
 <p>OmniPrep 以开放方式开发。欢迎贡献——bug 报告、功能请求、文档改进与 pull request。请遵循项目的贡献指南。</p>
-<h2 id="contact">联系</h2>
+</section>
+<section id="contact">
+<h2>联系</h2>
           <p>如有问题、反馈或合作意向，请在仓库提 <a href={issuesUrl} target="_blank" rel="noopener">issue</a> 或联系维护者。</p>
+</section>
       </article>
     </section>
 </Layout>

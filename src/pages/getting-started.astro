@@ -48,7 +48,7 @@ const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
           </div>
           <div class="callout note">
             <svg class="ci" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-            <p><strong>Storage note:</strong> multimodal preprocessing generates large intermediate files. Use <code>--remove_temp_files</code> when disk space is limited.</p>
+            <p><strong>Storage note:</strong> multimodal preprocessing generates large intermediate files. Use <code>--clean-workdir</code> when disk space is limited.</p>
           </div>
         </section>
 
@@ -131,7 +131,7 @@ const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
 
           <div class="callout tip">
             <svg class="ci" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            <p><strong>Tip:</strong> running with no arguments launches the interactive Streamlit web UI. Running with one argument (<code>--help</code>) prints the full parameter reference.</p>
+            <p><strong>Tip:</strong> running with <code>--help</code> prints the full parameter reference.</p>
           </div>
         </section>
 
